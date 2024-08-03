@@ -9,6 +9,8 @@ import (
 const QUANTIDADE_CACHES = 4
 const EXIT = false
 
+var cache_escolhida_int int
+
 const (
 	E = iota //0
 	S
@@ -45,12 +47,16 @@ type Processadores struct {
 
 func main() {
 	fmt.Println("Hello World!")
+	fmt.Println("Carregando Memória Principal")
+	mp := preencherLivros()
+	printar_MP(mp)
 
 	for {
 		var status bool = verificacao()
 		if !status {
 			return //quitar do sistema
 		}
+		//fmt.Print(cache_escolhida_int)
 	}
 
 }
@@ -58,14 +64,16 @@ func main() {
 func escolher_cache() {
 	var cache_escolhida string = strconv.Itoa(QUANTIDADE_CACHES)
 	//inválido por padrão.
-	fmt.Printf("\nQual cache você gostaria de usar? Selecione de 0 a %d\n", (QUANTIDADE_CACHES - 1))
+	fmt.Printf("\nQual usuário da biblioteca você gostaria de controlar? Selecione de 0 a %d\n", (QUANTIDADE_CACHES - 1))
 	fmt.Scan(&cache_escolhida)
-	cache_escolhida_int, err := strconv.Atoi(cache_escolhida)
+	var err error
+	cache_escolhida_int, err = strconv.Atoi(cache_escolhida)
 	for cache_escolhida_int >= QUANTIDADE_CACHES || cache_escolhida_int < 0 || err != nil {
-		fmt.Printf("Cache inexistente! Selecione uma cache válida, de 0 a %d\n", (QUANTIDADE_CACHES - 1))
+		fmt.Printf("Usuário inexistente! Selecione um usuário válido, de 0 a %d\n", (QUANTIDADE_CACHES - 1))
 		fmt.Scan(&cache_escolhida)
+		cache_escolhida_int, err = strconv.Atoi(cache_escolhida)
 	}
-	fmt.Print(cache_escolhida)
+	//fmt.Print(cache_escolhida_int)
 }
 
 func exit() bool {
@@ -94,5 +102,39 @@ func verificacao() bool {
 		return true
 	} else {
 		return false //não quer escolher.
+	}
+}
+
+func preencherLivros() MP {
+	secoes := []string{
+		"Tecnologia",
+		"Matemática",
+		"História",
+		"Literatura",
+		"Filosofia",
+		"Ciência",
+		"Arte",
+		"Geografia",
+		"Economia",
+		"Psicologia",
+	}
+
+	var mp MP
+	for i := 0; i < 50; i++ {
+		secao := secoes[i/5]
+		nome := fmt.Sprintf("Livro %d", i+1)
+		mp.Livros[i] = Livro{
+			Reservas: [][2]time.Time{},
+			Nome:     nome,
+			Secao:    secao,
+		}
+	}
+	return mp
+}
+
+func printar_MP(memoria MP) {
+
+	for i, livro := range memoria.Livros {
+		fmt.Printf("Livro %d: Nome = %s, Seção = %s\n", i+1, livro.Nome, livro.Secao)
 	}
 }
