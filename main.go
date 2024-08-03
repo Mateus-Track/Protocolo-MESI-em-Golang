@@ -6,53 +6,11 @@ import (
 	"time"
 )
 
-const QUANTIDADE_USUARIOS = 4
-const QUANTIDADE_LIVROS = 50
-
-const EXIT = false
-
-var cache_escolhida_int int
-
-const (
-	E = iota //0
-	S
-	M
-	I
-)
-
-// type Cache_Acoes interface {
-// 	Ler()
-// }
-
-type Cache struct { //pelo menos 5 posições.
-	Linhas [5]Linha //acredito que serão as mesmas linhas, só uma cópia da MP.
-}
-
-type Linha struct {
-	Livros [5]Livro
-	Bloco  int //saber se o bloco foi puxado pra cache ou nao.
-	Mesi   uint8
-}
-
-type MP struct { //pelo menos 50 posições;
-	Livros [50]Livro
-}
-
-type Livro struct {
-	Reservas [][2]time.Time
-	Nome     string
-	Secao    string
-}
-
-type Processadores struct {
-	Caches []Cache
-}
-
 func main() {
 	fmt.Println("Hello World!")
 	fmt.Println("Carregando Memória Principal")
 	mp := preencherLivros()
-	printar_MP(mp)
+	Printar_MP(mp)
 
 	for {
 		var status bool = verificacao() //+ cache escolhida.
@@ -68,7 +26,7 @@ func main() {
 		} else {
 			fmt.Printf("Operacao de Escrita na linha %d", linha)
 		}
-
+		//verificar se esse bloco está na Cache (cache_escolhida_int),
 	}
 
 }
@@ -142,13 +100,6 @@ func preencherLivros() MP {
 		}
 	}
 	return mp
-}
-
-func printar_MP(memoria MP) {
-
-	for i, livro := range memoria.Livros {
-		fmt.Printf("Livro %d: Nome = %s, Seção = %s\n", i+1, livro.Nome, livro.Secao)
-	}
 }
 
 func decide_operacao() bool {
