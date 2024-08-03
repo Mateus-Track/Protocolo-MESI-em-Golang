@@ -6,7 +6,9 @@ import (
 	"time"
 )
 
-const QUANTIDADE_CACHES = 4
+const QUANTIDADE_USUARIOS = 4
+const QUANTIDADE_LIVROS = 50
+
 const EXIT = false
 
 var cache_escolhida_int int
@@ -23,11 +25,12 @@ const (
 // }
 
 type Cache struct { //pelo menos 5 posições.
-	Linhas []Linha //acredito que serão as mesmas linhas, só uma cópia da MP.
+	Linhas [5]Linha //acredito que serão as mesmas linhas, só uma cópia da MP.
 }
 
 type Linha struct {
 	Livros [5]Livro
+	Bloco  int //saber se o bloco foi puxado pra cache ou nao.
 	Mesi   uint8
 }
 
@@ -52,24 +55,33 @@ func main() {
 	printar_MP(mp)
 
 	for {
-		var status bool = verificacao()
+		var status bool = verificacao() //+ cache escolhida.
 		if !status {
 			return //quitar do sistema
 		}
-		//fmt.Print(cache_escolhida_int)
+
+		linha := decide_linha()
+		leitura := decide_operacao() //se leitura = false, operação é de escrita.
+
+		if leitura {
+			fmt.Printf("Operacao de Leitura na linha %d", linha)
+		} else {
+			fmt.Printf("Operacao de Escrita na linha %d", linha)
+		}
+
 	}
 
 }
 
 func escolher_cache() {
-	var cache_escolhida string = strconv.Itoa(QUANTIDADE_CACHES)
+	var cache_escolhida string = strconv.Itoa(QUANTIDADE_USUARIOS)
 	//inválido por padrão.
-	fmt.Printf("\nQual usuário da biblioteca você gostaria de controlar? Selecione de 0 a %d\n", (QUANTIDADE_CACHES - 1))
+	fmt.Printf("\nQual usuário da biblioteca você gostaria de controlar? Selecione de 0 a %d\n", (QUANTIDADE_USUARIOS - 1))
 	fmt.Scan(&cache_escolhida)
 	var err error
 	cache_escolhida_int, err = strconv.Atoi(cache_escolhida)
-	for cache_escolhida_int >= QUANTIDADE_CACHES || cache_escolhida_int < 0 || err != nil {
-		fmt.Printf("Usuário inexistente! Selecione um usuário válido, de 0 a %d\n", (QUANTIDADE_CACHES - 1))
+	for cache_escolhida_int >= QUANTIDADE_USUARIOS || cache_escolhida_int < 0 || err != nil {
+		fmt.Printf("Usuário inexistente! Selecione um usuário válido, de 0 a %d\n", (QUANTIDADE_USUARIOS - 1))
 		fmt.Scan(&cache_escolhida)
 		cache_escolhida_int, err = strconv.Atoi(cache_escolhida)
 	}
@@ -137,4 +149,38 @@ func printar_MP(memoria MP) {
 	for i, livro := range memoria.Livros {
 		fmt.Printf("Livro %d: Nome = %s, Seção = %s\n", i+1, livro.Nome, livro.Secao)
 	}
+}
+
+func decide_operacao() bool {
+	var saida string = "2"
+	for {
+		fmt.Print("\nDeseja realizar uma operação de leitura (1) ou escrita (0)\n")
+		fmt.Scan(&saida)
+		//print(saida)
+		if saida != "0" && saida != "1" {
+			fmt.Print("ERRO! Selecione uma opção válida!")
+			saida = "2"
+			continue
+		} else if saida == "0" {
+			return false //é escrita.
+		} else {
+			return true //é leitura
+		}
+	}
+
+}
+
+func decide_linha() int {
+	var linha_escolhida string
+
+	fmt.Printf("\nQual livro da biblioteca você gostaria de acessar? Selecione de 0 a %d\n", (QUANTIDADE_LIVROS - 1))
+	fmt.Scan(&linha_escolhida)
+	linha_escolhida_int, err := strconv.Atoi(linha_escolhida)
+	for linha_escolhida_int >= QUANTIDADE_LIVROS || linha_escolhida_int < 0 || err != nil {
+		fmt.Printf("Livro inexistente! Selecione um livro válido, de 0 a %d\n", (QUANTIDADE_LIVROS - 1))
+		fmt.Scan(&linha_escolhida)
+		linha_escolhida_int, err = strconv.Atoi(linha_escolhida)
+	}
+	//fmt.Print(cache_escolhida_int)
+	return linha_escolhida_int
 }
