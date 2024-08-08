@@ -1,11 +1,13 @@
-package main
+package constantes
 
 const QUANTIDADE_USUARIOS = 4
 const QUANTIDADE_LIVROS = 50
+const QUANTIDADE_LINHAS_CACHE = 5
+const TAMANHO_BLOCO = 5
 
 const EXIT = false
 
-var cache_escolhida_int int
+var Cache_escolhida_int int
 
 const (
 	E = iota //0

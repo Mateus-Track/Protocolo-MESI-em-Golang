@@ -1,5 +1,5 @@
 package componentes
 
 type Processador struct {
-	cache Cache
+	Cachezinha Cache //precisa ser maiúsculo o nome da variável..
 }

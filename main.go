@@ -2,6 +2,7 @@ package main
 
 import (
 	"MESI/componentes"
+	"MESI/constantes"
 	"fmt"
 	"strconv"
 )
@@ -11,7 +12,7 @@ func main() {
 	fmt.Println("Carregando Memória Principal")
 	mp := componentes.PreencherLivros()
 	componentes.Printar_MP(mp)
-	bp := componentes.InicializaBP(QUANTIDADE_USUARIOS)
+	bp := componentes.InicializaBP(constantes.QUANTIDADE_USUARIOS)
 
 	for {
 		var status bool = verificacao() //+ cache escolhida.
@@ -22,8 +23,16 @@ func main() {
 		linha := decide_linha()
 		leitura := decide_operacao()                //se leitura = false, operação é de escrita.
 		bloco := componentes.Linha_Conversao(linha) //converte a linha para qual o bloco que ela deve ser acessado.
+		componentes.Printa_Cache(bp.BP[constantes.Cache_escolhida_int].Cachezinha)
+		encontrado := componentes.Procura_Cache(bp.BP[constantes.Cache_escolhida_int].Cachezinha, bloco)
 
-		//if(bp.BP[cache_escolhida_int].cache.linhas[0].bloco)
+		if encontrado {
+			fmt.Println("Encontrado! HIT")
+		} else {
+			fmt.Println("Não Encontrado, MISS!")
+		}
+
+		//bp.BP[cache_escolhida_int].cache.linhas[0].bloco)
 		if leitura {
 			fmt.Printf("Operacao de Leitura na linha %d", linha)
 		} else {
@@ -35,16 +44,16 @@ func main() {
 }
 
 func escolher_cache() {
-	var cache_escolhida string = strconv.Itoa(QUANTIDADE_USUARIOS)
+	var cache_escolhida string = strconv.Itoa(constantes.QUANTIDADE_USUARIOS)
 	//inválido por padrão.
-	fmt.Printf("\nQual usuário da biblioteca você gostaria de controlar? Selecione de 0 a %d\n", (QUANTIDADE_USUARIOS - 1))
+	fmt.Printf("\nQual usuário da biblioteca você gostaria de controlar? Selecione de 0 a %d\n", (constantes.QUANTIDADE_USUARIOS - 1))
 	fmt.Scan(&cache_escolhida)
 	var err error
-	cache_escolhida_int, err = strconv.Atoi(cache_escolhida)
-	for cache_escolhida_int >= QUANTIDADE_USUARIOS || cache_escolhida_int < 0 || err != nil {
-		fmt.Printf("Usuário inexistente! Selecione um usuário válido, de 0 a %d\n", (QUANTIDADE_USUARIOS - 1))
+	constantes.Cache_escolhida_int, err = strconv.Atoi(cache_escolhida)
+	for constantes.Cache_escolhida_int >= constantes.QUANTIDADE_USUARIOS || constantes.Cache_escolhida_int < 0 || err != nil {
+		fmt.Printf("Usuário inexistente! Selecione um usuário válido, de 0 a %d\n", (constantes.QUANTIDADE_USUARIOS - 1))
 		fmt.Scan(&cache_escolhida)
-		cache_escolhida_int, err = strconv.Atoi(cache_escolhida)
+		constantes.Cache_escolhida_int, err = strconv.Atoi(cache_escolhida)
 	}
 	//fmt.Print(cache_escolhida_int)
 }
@@ -100,11 +109,11 @@ func decide_operacao() bool {
 func decide_linha() int {
 	var linha_escolhida string
 
-	fmt.Printf("\nQual livro da biblioteca você gostaria de acessar? Selecione de 0 a %d\n", (QUANTIDADE_LIVROS - 1))
+	fmt.Printf("\nQual livro da biblioteca você gostaria de acessar? Selecione de 0 a %d\n", (constantes.QUANTIDADE_LIVROS - 1))
 	fmt.Scan(&linha_escolhida)
 	linha_escolhida_int, err := strconv.Atoi(linha_escolhida)
-	for linha_escolhida_int >= QUANTIDADE_LIVROS || linha_escolhida_int < 0 || err != nil {
-		fmt.Printf("Livro inexistente! Selecione um livro válido, de 0 a %d\n", (QUANTIDADE_LIVROS - 1))
+	for linha_escolhida_int >= constantes.QUANTIDADE_LIVROS || linha_escolhida_int < 0 || err != nil {
+		fmt.Printf("Livro inexistente! Selecione um livro válido, de 0 a %d\n", (constantes.QUANTIDADE_LIVROS - 1))
 		fmt.Scan(&linha_escolhida)
 		linha_escolhida_int, err = strconv.Atoi(linha_escolhida)
 	}
