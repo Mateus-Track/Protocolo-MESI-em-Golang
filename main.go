@@ -1,15 +1,15 @@
 package main
 
 import (
+	"MESI/componentes"
 	"fmt"
 	"strconv"
-	"time"
 )
 
 func main() {
 	fmt.Println("Hello World!")
 	fmt.Println("Carregando Memória Principal")
-	mp := preencherLivros()
+	mp := componentes.PreencherLivros()
 	Printar_MP(mp)
 
 	for {
@@ -73,33 +73,6 @@ func verificacao() bool {
 	} else {
 		return false //não quer escolher.
 	}
-}
-
-func preencherLivros() MP {
-	secoes := []string{
-		"Tecnologia",
-		"Matemática",
-		"História",
-		"Literatura",
-		"Filosofia",
-		"Ciência",
-		"Arte",
-		"Geografia",
-		"Economia",
-		"Psicologia",
-	}
-
-	var mp MP
-	for i := 0; i < 50; i++ {
-		secao := secoes[i/5]
-		nome := fmt.Sprintf("Livro %d", i+1)
-		mp.Livros[i] = Livro{
-			Reservas: [][2]time.Time{},
-			Nome:     nome,
-			Secao:    secao,
-		}
-	}
-	return mp
 }
 
 func decide_operacao() bool {
