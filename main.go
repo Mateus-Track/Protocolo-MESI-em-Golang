@@ -10,7 +10,8 @@ func main() {
 	fmt.Println("Hello World!")
 	fmt.Println("Carregando Memória Principal")
 	mp := componentes.PreencherLivros()
-	Printar_MP(mp)
+	componentes.Printar_MP(mp)
+	bp := componentes.InicializaBP(QUANTIDADE_USUARIOS)
 
 	for {
 		var status bool = verificacao() //+ cache escolhida.
@@ -19,8 +20,10 @@ func main() {
 		}
 
 		linha := decide_linha()
-		leitura := decide_operacao() //se leitura = false, operação é de escrita.
+		leitura := decide_operacao()                //se leitura = false, operação é de escrita.
+		bloco := componentes.Linha_Conversao(linha) //converte a linha para qual o bloco que ela deve ser acessado.
 
+		//if(bp.BP[cache_escolhida_int].cache.linhas[0].bloco)
 		if leitura {
 			fmt.Printf("Operacao de Leitura na linha %d", linha)
 		} else {
