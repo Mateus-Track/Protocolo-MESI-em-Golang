@@ -7,3 +7,11 @@ type Livro struct {
 	Nome     string
 	Secao    string
 }
+
+func InicializaLivro() Livro {
+	return Livro{
+		Reservas: make([][2]time.Time, 4),
+		Nome:     "",
+		Secao:    "",
+	}
+}

@@ -8,8 +8,8 @@ import (
 )
 
 func main() {
-	fmt.Println("Hello World!")
-	fmt.Println("Carregando Memória Principal")
+	fmt.Println("Bem vindo à Biblioteca Matheus Meu Deus!")
+	// fmt.Println("Carregando Memória Principal")
 	mp := componentes.PreencherLivros()
 	componentes.Printar_MP(mp)
 	bp := componentes.InicializaBP(constantes.QUANTIDADE_USUARIOS)
@@ -26,12 +26,9 @@ func main() {
 		componentes.Printa_Cache(bp.BP[constantes.Cache_escolhida_int].Cachezinha)
 		encontrado := componentes.Procura_Cache(bp.BP[constantes.Cache_escolhida_int].Cachezinha, bloco)
 
-		if encontrado {
-			fmt.Println("Encontrado! HIT")
-		} else {
-			fmt.Println("Não Encontrado, MISS!")
-		}
+		transacao := componentes.Define_Transacao(encontrado, leitura, bloco, linha) //read ou write, hit ou miss. Está dando certo para miss, testar com HIT.
 
+		componentes.Realiza_Transacao(transacao, &bp.BP[constantes.Cache_escolhida_int].Cachezinha, bloco, linha, mp)
 		//bp.BP[cache_escolhida_int].cache.linhas[0].bloco)
 		if leitura {
 			fmt.Printf("Operacao de Leitura na linha %d", linha)
@@ -46,7 +43,7 @@ func main() {
 func escolher_cache() {
 	var cache_escolhida string = strconv.Itoa(constantes.QUANTIDADE_USUARIOS)
 	//inválido por padrão.
-	fmt.Printf("\nQual usuário da biblioteca você gostaria de controlar? Selecione de 0 a %d\n", (constantes.QUANTIDADE_USUARIOS - 1))
+	fmt.Printf("\nQual usuário da biblioteca você gostaria de controlar? Roger Waters (0), Slash (1), Jonathan Davis (2) ou Anitta (3)\n")
 	fmt.Scan(&cache_escolhida)
 	var err error
 	constantes.Cache_escolhida_int, err = strconv.Atoi(cache_escolhida)
@@ -55,17 +52,17 @@ func escolher_cache() {
 		fmt.Scan(&cache_escolhida)
 		constantes.Cache_escolhida_int, err = strconv.Atoi(cache_escolhida)
 	}
-	//fmt.Print(cache_escolhida_int)
+	//fmt.Print(cache_escolhida_int)1
 }
 
 func exit() bool {
 	var saida string = "2"
 	for {
-		fmt.Print("\nDeseja continuar operando no sistema (1) ou deseja finalizar (0)\n")
+		fmt.Print("\nDeseja realizar uma operação no sistema? (1) Ou deseja finalizar? (0)\n")
 		fmt.Scan(&saida)
 		//print(saida)
 		if saida != "0" && saida != "1" {
-			fmt.Print("ERRO! Selecione uma opção válida!")
+			fmt.Print("Não há uma operação com esse input! Por favor selecione uma opção válida!")
 			saida = "2"
 			continue
 		} else if saida == "0" {
@@ -90,11 +87,11 @@ func verificacao() bool {
 func decide_operacao() bool {
 	var saida string = "2"
 	for {
-		fmt.Print("\nDeseja realizar uma operação de leitura (1) ou escrita (0)\n")
+		fmt.Print("\nDeseja consultar as reservas do livro (1 - Operação de Leitura) ou registrar uma nova reserva nele (0 - Operação de Escrita)\n")
 		fmt.Scan(&saida)
 		//print(saida)
 		if saida != "0" && saida != "1" {
-			fmt.Print("ERRO! Selecione uma opção válida!")
+			fmt.Print("Não há uma operação com esse input! Por favor selecione uma opção válida!")
 			saida = "2"
 			continue
 		} else if saida == "0" {

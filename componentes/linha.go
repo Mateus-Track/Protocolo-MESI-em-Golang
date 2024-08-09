@@ -5,7 +5,7 @@ import "fmt"
 type Linha struct {
 	Livros [5]Livro
 	Bloco  int //saber se o bloco foi puxado pra cache ou nao.
-	Mesi   uint8
+	Mesi   int8
 }
 
 func Linha_Conversao(linha int) int {
@@ -20,4 +20,17 @@ func (l Linha) PrintLinha() {
 	}
 	fmt.Printf("  Bloco: %d\n", l.Bloco)
 	fmt.Printf("  MESI: %d\n", l.Mesi)
+}
+
+func InicializaLinha() Linha {
+	linha := Linha{
+		Livros: [5]Livro{},
+		Bloco:  -1, // Valor inicial para o bloco
+		Mesi:   -1, // Valor inicial para MESI, meti o loco aq pra n começar em algum.	}
+	}
+
+	for i := range linha.Livros {
+		linha.Livros[i] = InicializaLivro()
+	}
+	return linha
 }

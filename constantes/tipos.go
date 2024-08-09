@@ -15,3 +15,10 @@ const (
 	M
 	I
 )
+
+const ( //read hit, read miss...
+	RH = iota //0
+	RM
+	WH
+	WM
+)

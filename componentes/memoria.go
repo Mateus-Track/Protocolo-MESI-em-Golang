@@ -42,3 +42,12 @@ func Printar_MP(memoria MP) {
 		fmt.Printf("Livro %d: Nome = %s, Seção = %s\n", i+1, livro.Nome, livro.Secao)
 	}
 }
+
+func TransferirMPCache(mp MP, c *Cache, index int, posicao uint8, tamanho_bloco int) {
+	i := 0
+	for i < tamanho_bloco {
+		c.Linhas[posicao].Livros[i] = mp.Livros[index]
+		i++
+		index++
+	}
+}
