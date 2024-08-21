@@ -8,7 +8,7 @@ import (
 
 type MP struct { //pelo menos 50 posições;
 	Livros [50]Livro
-	Tags   [10]int8 //guardar na MP as tags, facilitar.
+	Tags   [10]MesiFlags //guardar na MP as tags, facilitar.
 }
 
 func PreencherLivros() MP {
@@ -37,7 +37,7 @@ func PreencherLivros() MP {
 	}
 
 	for i := range mp.Tags {
-		mp.Tags[i] = -1
+		mp.Tags[i] = UNDEFINED
 	}
 
 	return mp

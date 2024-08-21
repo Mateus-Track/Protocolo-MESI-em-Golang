@@ -14,33 +14,29 @@ func main() {
 	componentes.Printar_MP(mp)
 	bp := componentes.InicializaBP(constantes.QUANTIDADE_USUARIOS)
 
-	for {
-		var status bool = verificacao() //+ cache escolhida.
-		if !status {
-			return //quitar do sistema
-		}
+	for !should_exit() {
+		cache_num := escolher_cache()
 
 		linha := decide_linha()
-		leitura := decide_operacao() //se leitura = false, operação é de escrita.
+		leitura := decide_operacao()
 
 		//componentes.Printa_Cache(bp.BP[constantes.Cache_escolhida_int].Cachezinha)
-		cache_escolhida := &bp.BP[constantes.Cache_escolhida_int].Cachezinha
+		cache := &bp.BP[cache_num].Cachezinha
 
 		// componentes.Printa_Cache(*cache_escolhida)
-
-		cache_index := componentes.Procura_Cache(*cache_escolhida, linha)
+		cache_index := cache.Procura_Cache(linha)
 
 		fmt.Printf("Cache index = %d", cache_index)
 		switch {
 		case cache_index >= 0 && leitura:
 			fmt.Println("Bloco encontrado na Cache! Read Hit")
-			componentes.Read_Hit(cache_escolhida, linha)
+			cache.Read_Hit(linha)
 		case cache_index >= 0:
 			fmt.Println("Bloco encontrado na Cache! Write Hit")
 			//componentes.Write_Hit(&cache_escolhida, linha)
 		case leitura:
 			fmt.Println("Bloco não encontrado! Read Miss")
-			componentes.Read_Miss(cache_escolhida, linha, &mp, &bp)
+			cache.Read_Miss(linha, &mp, &bp)
 		case cache_index < 0 && !leitura:
 			fmt.Println("Bloco não encontrado! Write Miss")
 			//return constantes.WM
@@ -63,49 +59,47 @@ func main() {
 
 }
 
-func escolher_cache() {
-	var cache_escolhida string = strconv.Itoa(constantes.QUANTIDADE_USUARIOS)
-	//inválido por padrão.
+func escolher_cache() uint {
+	var cache_num uint
+
 	fmt.Printf("\nQual usuário da biblioteca você gostaria de controlar? Roger Waters (0), Slash (1), Jonathan Davis (2) ou Anitta (3)\n")
-	fmt.Scan(&cache_escolhida)
-	var err error
-	constantes.Cache_escolhida_int, err = strconv.Atoi(cache_escolhida)
-	for constantes.Cache_escolhida_int >= constantes.QUANTIDADE_USUARIOS || constantes.Cache_escolhida_int < 0 || err != nil {
+	_, err := fmt.Scan(&cache_num)
+
+	for err != nil || cache_num >= constantes.QUANTIDADE_USUARIOS {
 		fmt.Printf("Usuário inexistente! Selecione um usuário válido, de 0 a %d\n", (constantes.QUANTIDADE_USUARIOS - 1))
-		fmt.Scan(&cache_escolhida)
-		constantes.Cache_escolhida_int, err = strconv.Atoi(cache_escolhida)
+		_, err = fmt.Scan(&cache_num)
 	}
-	//fmt.Print(cache_escolhida_int)1
+
+	fmt.Print(cache_num)
+	return cache_num
 }
 
-func exit() bool {
-	var saida string = "2"
-	for {
+func should_exit() bool {
+	var saida int = -1
+
+	for saida < 0 {
 		fmt.Print("\nDeseja realizar uma operação no sistema? (1) Ou deseja finalizar? (0)\n")
-		fmt.Scan(&saida)
-		//print(saida)
-		if saida != "0" && saida != "1" {
+		_, err := fmt.Scan(&saida)
+
+		if err != nil || (saida != 0 && saida != 1) {
 			fmt.Print("Não há uma operação com esse input! Por favor selecione uma opção válida!")
-			saida = "2"
-			continue
-		} else if saida == "0" {
-			return false
-		} else {
-			return true
+			saida = -1
 		}
 	}
+
+	return saida == 0
 }
 
-func verificacao() bool {
-	var estatos bool = exit()
+// func verificacao() bool {
+// 	estatos, err := should_exit()
 
-	if estatos {
-		escolher_cache()
-		return true
-	} else {
-		return false //não quer escolher.
-	}
-}
+// 	if estatos {
+// 		escolher_cache()
+// 		return true
+// 	} else {
+// 		return false //não quer escolher.
+// 	}
+// }
 
 func decide_operacao() bool {
 	var saida string = "2"

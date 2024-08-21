@@ -1,11 +1,13 @@
 package componentes
 
 type Processador struct {
+	id         int
 	Cachezinha Cache //precisa ser maiúsculo o nome da variável..
 }
 
-func InicializaProcessador() Processador {
+func InicializaProcessador(id int) Processador {
 	return Processador{
-		Cachezinha: InicializaCache(),
+		id:         id,
+		Cachezinha: InicializaCache(id),
 	}
 }
