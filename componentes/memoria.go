@@ -52,3 +52,12 @@ func TransferirMPCache(mp MP, c *Cache, index int, posicao uint8) {
 		index++
 	}
 }
+
+func TransferirCacheMP(mp MP, c *Cache, index int, posicao uint8) {
+	i := 0
+	for i < constantes.TAMANHO_BLOCO {
+		mp.Livros[index] = c.Linhas[posicao].Livros[i]
+		i++
+		index++
+	}
+}

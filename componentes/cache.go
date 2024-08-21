@@ -93,7 +93,12 @@ func Read_Miss(c *Cache, linha int, mp MP) { //por enquanto, n vou ver as TAGS, 
 		c.Linhas[posicao].Bloco = linha / 5
 		Printa_Cache(*c)
 	} else { //tirar da fila, dar append no final lá, retornar pra mp.
-		fmt.Print("la ele")
+		primeiroElemento := c.Fila[0]
+		c.Fila = c.Fila[1:]
+		TransferirCacheMP(mp, c, (c.Linhas[primeiroElemento].Bloco * 5), primeiroElemento) //transferir de volta pra MP, fazer SÓ QUANDO HOUVE mudança.
+		c.Fila = append(c.Fila, primeiroElemento)
+		TransferirMPCache(mp, c, (bloco * 5), primeiroElemento)
+		Printa_Cache(*c)
 	}
 
 }
