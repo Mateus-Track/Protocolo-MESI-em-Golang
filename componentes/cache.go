@@ -72,10 +72,14 @@ func Realiza_Transacao(transacao int16, c *Cache, linha int, mp MP, cache_index 
 
 }
 
-func Read_Miss(c *Cache, linha int, mp *MP) { //por enquanto, n vou ver as TAGS, apenas puxar sem pensar.
+func Read_Miss(c *Cache, linha int, mp *MP, bp *BancoProcessadores) { //por enquanto, n vou ver as TAGS, apenas puxar sem pensar.
 	tag_nova := Verifica_MESI(c, linha, mp)
 	if tag_nova == -10 {
 		panic("Erro ao Verificar MESI da MP. Abortando.")
+	}
+
+	if tag_nova == constantes.S { //teste nesse caso
+		Notifica_Caches(bp, linha, tag_nova, c)
 	}
 
 	bloco := linha / 5
@@ -105,8 +109,9 @@ func Read_Hit(c *Cache, linha int) {
 
 	index := Procura_Cache(*c, linha)
 	livro := c.Linhas[index].Livros[linha%5]
-	fmt.Printf("  Livro: %s\n", livro.Nome)
-	fmt.Printf("  Secao: %s\n", livro.Secao)
+	fmt.Printf("Livro: %s\n", livro.Nome)
+	fmt.Printf("Secao: %s\n", livro.Secao)
+	fmt.Printf("MESI do bloco: %d\n", c.Linhas[index].Mesi)
 
 }
 
@@ -158,6 +163,27 @@ func Verifica_MESI(c *Cache, linha int, mp *MP) int8 {
 	}
 
 	return -10 //erro
+}
+
+func Notifica_Caches(bp *BancoProcessadores, linha int, tag_nova int8, c *Cache) {
+
+	for i := 0; i < constantes.QUANTIDADE_USUARIOS; i++ {
+		fmt.Print("To no loop")
+		if i != constantes.Cache_escolhida_int { // nao vai mudar a própria tag, mudar a dos outros.
+			cache_index := Procura_Cache(bp.BP[i].Cachezinha, linha)
+			if cache_index >= 0 { //tem nessa cache esse bloco, ver o que fazer com sua TAG_MESI.
+				linha_analisada := bp.BP[i].Cachezinha.Linhas[cache_index]
+				if linha_analisada.Mesi == constantes.E && tag_nova == constantes.S {
+					fmt.Print("Achei! Mudando Tag!")
+					//linha_analisada.Mesi = constantes.S //se eu fizer isso, nao muda. é uma cópia da referencia só.
+					bp.BP[i].Cachezinha.Linhas[cache_index].Mesi = constantes.S
+				}
+
+			}
+
+		}
+
+	}
 }
 
 // func Define_Transacao(encontrado bool, leitura bool) {
