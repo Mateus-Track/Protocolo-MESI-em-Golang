@@ -8,10 +8,6 @@ type Linha struct {
 	Mesi   int8
 }
 
-func Linha_Conversao(linha int) int {
-	return linha / 5
-}
-
 func (l Linha) PrintLinha() {
 	fmt.Println("Linha:")
 	for i, livro := range l.Livros {

@@ -21,15 +21,38 @@ func main() {
 		}
 
 		linha := decide_linha()
-		leitura := decide_operacao()                //se leitura = false, operação é de escrita.
-		bloco := componentes.Linha_Conversao(linha) //converte a linha para qual o bloco que ela deve ser acessado.
-		componentes.Printa_Cache(bp.BP[constantes.Cache_escolhida_int].Cachezinha)
-		encontrado := componentes.Procura_Cache(bp.BP[constantes.Cache_escolhida_int].Cachezinha, bloco)
+		leitura := decide_operacao() //se leitura = false, operação é de escrita.
 
-		transacao := componentes.Define_Transacao(encontrado, leitura, bloco, linha) //read ou write, hit ou miss. Está dando certo para miss, testar com HIT.
+		//componentes.Printa_Cache(bp.BP[constantes.Cache_escolhida_int].Cachezinha)
+		cache_escolhida := &bp.BP[constantes.Cache_escolhida_int].Cachezinha
 
-		componentes.Realiza_Transacao(transacao, &bp.BP[constantes.Cache_escolhida_int].Cachezinha, bloco, linha, mp)
-		//bp.BP[cache_escolhida_int].cache.linhas[0].bloco)
+		// componentes.Printa_Cache(*cache_escolhida)
+
+		cache_index := componentes.Procura_Cache(*cache_escolhida, linha)
+
+		fmt.Printf("Cache index = %d", cache_index)
+		switch {
+		case cache_index >= 0 && leitura:
+			fmt.Println("Bloco encontrado na Cache! Read Hit")
+			componentes.Read_Hit(cache_escolhida, linha)
+		case cache_index >= 0:
+			fmt.Println("Bloco encontrado na Cache! Write Hit")
+			//componentes.Write_Hit(&cache_escolhida, linha)
+		case leitura:
+			fmt.Println("Bloco não encontrado! Read Miss")
+			componentes.Read_Miss(cache_escolhida, linha, mp)
+		case cache_index < 0 && !leitura:
+			fmt.Println("Bloco não encontrado! Write Miss")
+			//return constantes.WM
+		default:
+			panic("Erro, não encontrada essa transação.")
+			// return -1
+		}
+
+		//transacao := componentes.Define_Transacao(cache_index >= 0, leitura) //read ou write, hit ou miss. Está dando certo para miss, testar com HIT.
+
+		//omponentes.Realiza_Transacao(transacao, &cache_escolhida, linha, mp, cache_index)
+
 		if leitura {
 			fmt.Printf("Operacao de Leitura na linha %d", linha)
 		} else {

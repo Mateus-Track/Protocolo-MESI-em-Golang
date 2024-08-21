@@ -12,17 +12,20 @@ type Cache struct { //pelo menos 5 posições.
 	Fila   []uint8
 }
 
-func Procura_Cache(cache Cache, bloco int) bool { //verifica se o bloco está na cache.
+func Procura_Cache(cache Cache, linha int) int { //verifica se o bloco está na cache.
+
+	bloco := linha / 5
 	i := 0
 	for i < constantes.QUANTIDADE_LINHAS_CACHE {
 		if cache.Linhas[i].Bloco == bloco {
 			fmt.Printf("Achou! - %d com %d", cache.Linhas[i].Bloco, bloco)
-			return true
+			return i
 		}
+
 		i++
 	}
 
-	return false
+	return -1
 }
 
 func Printa_Cache(cache Cache) { //sem a fila por enquanto.
@@ -51,7 +54,7 @@ func InicializaCache() Cache {
 	return cache
 }
 
-func Define_Transacao(encontrado, leitura bool, bloco, linha int) int16 { //não sei se é melhor passar ja o bloco e linha e chamar as transações ou fazer separado.
+func Define_Transacao(encontrado, leitura bool) int16 { //não sei se é melhor passar ja o bloco e linha e chamar as transações ou fazer separado.
 	switch {
 	case encontrado && leitura:
 		fmt.Println("Bloco encontrado na Cache! Read Hit")
@@ -73,21 +76,12 @@ func Define_Transacao(encontrado, leitura bool, bloco, linha int) int16 { //não
 
 }
 
-func Realiza_Transacao(transacao int16, c *Cache, bloco, linha int, mp MP) {
-	switch transacao {
-	case constantes.RH:
-		//Read_Hit()
-	case constantes.RM:
-		Read_Miss(c, bloco, linha, mp)
-	case constantes.WH:
-		//Write_Hit()
-	case constantes.WM:
-		//Write_Miss()
-	}
+func Realiza_Transacao(transacao int16, c *Cache, linha int, mp MP, cache_index int) {
+
 }
 
-func Read_Miss(c *Cache, bloco, linha int, mp MP) { //por enquanto, n vou ver as TAGS, apenas puxar sem pensar.
-	index := bloco * 5
+func Read_Miss(c *Cache, linha int, mp MP) { //por enquanto, n vou ver as TAGS, apenas puxar sem pensar.
+	bloco := linha / 5
 
 	if c.TemEspacoLivre() {
 		disponiveis := c.ValoresDisponiveis()
@@ -95,12 +89,21 @@ func Read_Miss(c *Cache, bloco, linha int, mp MP) { //por enquanto, n vou ver as
 		posicao := disponiveis[numero_random]
 		fmt.Print(posicao)
 		c.Fila = append(c.Fila, posicao)
-		TransferirMPCache(mp, c, index, posicao, constantes.TAMANHO_BLOCO)
-		c.Linhas[posicao].Bloco = bloco
+		TransferirMPCache(mp, c, (bloco * 5), posicao)
+		c.Linhas[posicao].Bloco = linha / 5
 		Printa_Cache(*c)
 	} else { //tirar da fila, dar append no final lá, retornar pra mp.
 		fmt.Print("la ele")
 	}
+
+}
+
+func Read_Hit(c *Cache, linha int) {
+
+	index := Procura_Cache(*c, linha)
+	livro := c.Linhas[index].Livros[linha%5]
+	fmt.Printf("  Livro: %s\n", livro.Nome)
+	fmt.Printf("  Secao: %s\n", livro.Secao)
 
 }
 

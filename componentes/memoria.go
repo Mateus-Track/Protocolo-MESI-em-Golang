@@ -1,6 +1,7 @@
 package componentes
 
 import (
+	"MESI/constantes"
 	"fmt"
 	"time"
 )
@@ -43,9 +44,9 @@ func Printar_MP(memoria MP) {
 	}
 }
 
-func TransferirMPCache(mp MP, c *Cache, index int, posicao uint8, tamanho_bloco int) {
+func TransferirMPCache(mp MP, c *Cache, index int, posicao uint8) {
 	i := 0
-	for i < tamanho_bloco {
+	for i < constantes.TAMANHO_BLOCO {
 		c.Linhas[posicao].Livros[i] = mp.Livros[index]
 		i++
 		index++
