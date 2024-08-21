@@ -25,7 +25,7 @@ func InicializaBP(QUANTIDADE_USUARIOS int) BancoProcessadores {
 func (bp *BancoProcessadores) Notifica_Caches(linha int, tag_nova MesiFlags, cache_id int) {
 	for i := 0; i < constantes.QUANTIDADE_USUARIOS; i++ {
 		fmt.Print("To no loop")
-		cache := bp.BP[i].Cachezinha
+		cache := &bp.BP[i].Cachezinha
 
 		if cache.id != cache_id { // nao vai mudar a própria tag, mudar a dos outros.
 			cache_index := cache.Procura_Cache(linha)
@@ -35,6 +35,8 @@ func (bp *BancoProcessadores) Notifica_Caches(linha int, tag_nova MesiFlags, cac
 					fmt.Print("Achei! Mudando Tag!")
 					//linha_analisada.Mesi = constantes.S //se eu fizer isso, nao muda. é uma cópia da referencia só.
 					cache.Linhas[cache_index].Mesi = S
+				} else if tag_nova == M {
+					cache.Linhas[cache_index].Mesi = I
 				}
 
 			}
