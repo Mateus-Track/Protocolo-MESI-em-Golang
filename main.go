@@ -40,7 +40,7 @@ func main() {
 			//componentes.Write_Hit(&cache_escolhida, linha)
 		case leitura:
 			fmt.Println("Bloco não encontrado! Read Miss")
-			componentes.Read_Miss(cache_escolhida, linha, mp)
+			componentes.Read_Miss(cache_escolhida, linha, &mp)
 		case cache_index < 0 && !leitura:
 			fmt.Println("Bloco não encontrado! Write Miss")
 			//return constantes.WM

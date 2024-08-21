@@ -10,9 +10,9 @@ const EXIT = false
 var Cache_escolhida_int int
 
 const (
-	E = iota //0
+	M = iota //0
+	E
 	S
-	M
 	I
 )
 

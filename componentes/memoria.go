@@ -8,6 +8,7 @@ import (
 
 type MP struct { //pelo menos 50 posições;
 	Livros [50]Livro
+	Tags   [10]int8 //guardar na MP as tags, facilitar.
 }
 
 func PreencherLivros() MP {
@@ -34,6 +35,11 @@ func PreencherLivros() MP {
 			Secao:    secao,
 		}
 	}
+
+	for i := range mp.Tags {
+		mp.Tags[i] = -1
+	}
+
 	return mp
 }
 
@@ -44,7 +50,7 @@ func Printar_MP(memoria MP) {
 	}
 }
 
-func TransferirMPCache(mp MP, c *Cache, index int, posicao uint8) {
+func TransferirMPCache(mp *MP, c *Cache, index int, posicao uint8) {
 	i := 0
 	for i < constantes.TAMANHO_BLOCO {
 		c.Linhas[posicao].Livros[i] = mp.Livros[index]
@@ -53,7 +59,7 @@ func TransferirMPCache(mp MP, c *Cache, index int, posicao uint8) {
 	}
 }
 
-func TransferirCacheMP(mp MP, c *Cache, index int, posicao uint8) {
+func TransferirCacheMP(mp *MP, c *Cache, index int, posicao uint8) {
 	i := 0
 	for i < constantes.TAMANHO_BLOCO {
 		mp.Livros[index] = c.Linhas[posicao].Livros[i]

@@ -18,7 +18,6 @@ func Procura_Cache(cache Cache, linha int) int { //verifica se o bloco está na 
 	i := 0
 	for i < constantes.QUANTIDADE_LINHAS_CACHE {
 		if cache.Linhas[i].Bloco == bloco {
-			fmt.Printf("Achou! - %d com %d", cache.Linhas[i].Bloco, bloco)
 			return i
 		}
 
@@ -29,14 +28,11 @@ func Procura_Cache(cache Cache, linha int) int { //verifica se o bloco está na 
 }
 
 func Printa_Cache(cache Cache) { //sem a fila por enquanto.
-	fmt.Println("Cache:")
 	i := 0
 	for i < constantes.QUANTIDADE_LINHAS_CACHE {
 		cache.Linhas[i].PrintLinha()
 		i++
 	}
-	fmt.Println("Fila da Cache: ")
-	fmt.Println("Fila:", cache.Fila)
 
 }
 
@@ -57,17 +53,13 @@ func InicializaCache() Cache {
 func Define_Transacao(encontrado, leitura bool) int16 { //não sei se é melhor passar ja o bloco e linha e chamar as transações ou fazer separado.
 	switch {
 	case encontrado && leitura:
-		fmt.Println("Bloco encontrado na Cache! Read Hit")
 		return constantes.RH
 	case encontrado:
-		fmt.Println("Bloco encontrado na Cache! Write Hit")
 		return constantes.WH
 	case leitura:
-		fmt.Println("Bloco não encontrado! Read Miss")
 		return constantes.RM
 		//Read_Miss(constantes.Cache_escolhida_int, bloco, linha)
 	case !encontrado && !leitura:
-		fmt.Println("Bloco não encontrado! Write Miss")
 		return constantes.WM
 	default:
 		panic("Erro, não encontrada essa transação.")
@@ -80,23 +72,29 @@ func Realiza_Transacao(transacao int16, c *Cache, linha int, mp MP, cache_index 
 
 }
 
-func Read_Miss(c *Cache, linha int, mp MP) { //por enquanto, n vou ver as TAGS, apenas puxar sem pensar.
+func Read_Miss(c *Cache, linha int, mp *MP) { //por enquanto, n vou ver as TAGS, apenas puxar sem pensar.
+	tag_nova := Verifica_MESI(c, linha, mp)
+	if tag_nova == -10 {
+		panic("Erro ao Verificar MESI da MP. Abortando.")
+	}
+
 	bloco := linha / 5
 
 	if c.TemEspacoLivre() {
 		disponiveis := c.ValoresDisponiveis()
 		numero_random := Gerar_Aleatorio(len(disponiveis))
 		posicao := disponiveis[numero_random]
-		fmt.Print(posicao)
 		c.Fila = append(c.Fila, posicao)
 		TransferirMPCache(mp, c, (bloco * 5), posicao)
 		c.Linhas[posicao].Bloco = linha / 5
+		c.Linhas[posicao].Mesi = tag_nova
 		Printa_Cache(*c)
 	} else { //tirar da fila, dar append no final lá, retornar pra mp.
 		primeiroElemento := c.Fila[0]
 		c.Fila = c.Fila[1:]
 		TransferirCacheMP(mp, c, (c.Linhas[primeiroElemento].Bloco * 5), primeiroElemento) //transferir de volta pra MP, fazer SÓ QUANDO HOUVE mudança.
 		c.Fila = append(c.Fila, primeiroElemento)
+		c.Linhas[primeiroElemento].Bloco = linha / 5
 		TransferirMPCache(mp, c, (bloco * 5), primeiroElemento)
 		Printa_Cache(*c)
 	}
@@ -141,14 +139,31 @@ func (c *Cache) ValoresDisponiveis() []uint8 { // n entendi totalmente.
 	return disponiveis
 }
 
+func Verifica_MESI(c *Cache, linha int, mp *MP) int8 {
+	bloco := linha / 5
+	tag_bloco := mp.Tags[bloco]
+
+	switch {
+	case tag_bloco == -1:
+		//colocar a tag de Exclusivo na MP também.
+		mp.Tags[bloco] = constantes.E
+		return constantes.E //nao foi puxado ainda, será exclusivo.
+	case tag_bloco == constantes.E:
+		mp.Tags[bloco] = constantes.S
+		return constantes.S //E VAI TER QUE ENVIAR ISSO PARA o outro processador que contém esse dado, nao fiz ainda.
+	case tag_bloco == constantes.S:
+		return constantes.S //continua shared
+	case tag_bloco == constantes.I:
+		//vai ter que buscar no lugar correto.
+	}
+
+	return -10 //erro
+}
+
 // func Define_Transacao(encontrado bool, leitura bool) {
 // 	if encontrado && leitura {
-// 		fmt.Println("Bloco encontrado na Cache! Read Hit")
 // 	} else if encontrado {
-// 		fmt.Println("Bloco encontrado na Cache! Write Hit")
 // 	} else if leitura {
-// 		fmt.Println("Bloco não encontrado! Read Miss")
 // 	} else {
-// 		fmt.Println("Bloco não encontrado! Write Miss")
 // 	}
 // }
