@@ -143,9 +143,14 @@ func (cache *Cache) Read_Miss(linha int, mp *MP, bp *BancoProcessadores) {
 
 	switch mesi_bp {
 	case M:
+		fmt.Print("Achei um M mesmo.")
 		linha_escrita := cache.Carregar_Linha(linha_bp.Livros, bloco, mp, bp)
 		linha_escrita.Mesi = S
+
+		//linha_nova := cache.Carregar_Linha(linha_bp.Livros, bloco, mp, bp)
+		linha_bp.PrintLinha()
 		linha_bp.Mesi = S
+		linha_bp.PrintLinha()
 		Transferir_Cache_MP(mp, linha_bp, bloco)
 
 	case E:
