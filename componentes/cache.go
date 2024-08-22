@@ -1,6 +1,7 @@
 package componentes
 
 import (
+	"MESI/constantes"
 	"errors"
 	"fmt"
 	"math/rand"
@@ -82,10 +83,15 @@ func (cache *Cache) Status_Cache(linha int) (MesiFlags, *Linha, error) {
 }
 
 func (cache *Cache) Printa_Cache() { //sem a fila por enquanto.
-	i := 0
-	for i < QUANTIDADE_LINHAS_CACHE {
-		cache.Linhas[i].PrintLinha()
-		i++
+	for i := 0; i < QUANTIDADE_LINHAS_CACHE; i++ {
+		fmt.Printf("Linha da Cache de número %d:\n\n", i+1)
+		fmt.Printf("MESI da linha = %d\n", cache.Linhas[i].Mesi)
+		for j := 0; j < constantes.TAMANHO_BLOCO; j++ {
+			fmt.Printf("Livro armazenado:\n")
+			fmt.Printf("%s", cache.Linhas[i].Livros[j].ToString())
+			//cache.Linhas[i].PrintLinha()
+		}
+		fmt.Printf("\n")
 	}
 }
 
@@ -206,6 +212,7 @@ func (cache *Cache) Write_Miss(linha int, reserva Reserva, mp *MP, bp *BancoProc
 	livro.AdicionarReserva(reserva)
 	cache.Printa_Cache()
 
+	fmt.Printf("Escrita realizada:\n")
 	fmt.Printf("%s", livro.ToString())
 	fmt.Printf("MESI do bloco: %d\n", linha_cache.Mesi)
 }
@@ -222,6 +229,7 @@ func (cache *Cache) Write_Hit(linha int, reserva Reserva, mp *MP, bp *BancoProce
 
 	livro.AdicionarReserva(reserva)
 
+	fmt.Printf("Escrita realizada:\n")
 	fmt.Printf("%s", livro.ToString())
 	fmt.Printf("MESI do bloco: %d\n", linha_cache.Mesi)
 }
