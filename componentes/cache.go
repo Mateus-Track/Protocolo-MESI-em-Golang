@@ -151,6 +151,7 @@ func (cache *Cache) Read_Miss(linha int, mp *MP, bp *BancoProcessadores) {
 		linha_bp.PrintLinha()
 		linha_bp.Mesi = S
 		linha_bp.PrintLinha()
+		bp.BP[0].Cachezinha.Printa_Cache() //testando especificamente com escrever na CACHE 0 , puxar em outra, aí ele mostrou como ta na 0
 		Transferir_Cache_MP(mp, linha_bp, bloco)
 
 	case E:
