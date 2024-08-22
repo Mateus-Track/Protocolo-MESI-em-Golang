@@ -3,12 +3,11 @@ package componentes
 import (
 	"MESI/constantes"
 	"fmt"
-	"time"
 )
 
 type MP struct { //pelo menos 50 posições;
 	Livros [50]Livro
-	Tags   [10]MesiFlags //guardar na MP as tags, facilitar.
+	// Tags   [10]MesiFlags //guardar na MP as tags, facilitar.
 }
 
 func PreencherLivros() MP {
@@ -30,15 +29,15 @@ func PreencherLivros() MP {
 		secao := secoes[i/5]
 		nome := fmt.Sprintf("Livro %d", i)
 		mp.Livros[i] = Livro{
-			Reservas: [][2]time.Time{},
+			Reservas: []Reserva{},
 			Nome:     nome,
 			Secao:    secao,
 		}
 	}
 
-	for i := range mp.Tags {
-		mp.Tags[i] = UNDEFINED
-	}
+	// for i := range mp.Tags {
+	// 	mp.Tags[i] = UNDEFINED
+	// }
 
 	return mp
 }
@@ -50,20 +49,18 @@ func Printar_MP(memoria MP) {
 	}
 }
 
-func TransferirMPCache(mp *MP, c *Cache, index int, posicao uint8) {
-	i := 0
-	for i < constantes.TAMANHO_BLOCO {
-		c.Linhas[posicao].Livros[i] = mp.Livros[index]
-		i++
-		index++
+func Transferir_MP_Cache(mp *MP, cache *Cache, bp *BancoProcessadores, bloco int) *Linha {
+	linha_mp := [5]Livro{}
+
+	for i := 0; i < constantes.TAMANHO_BLOCO; i++ {
+		linha_mp[i] = mp.Livros[bloco*constantes.TAMANHO_BLOCO+i]
 	}
+
+	return cache.Carregar_Linha(linha_mp, bloco, mp, bp)
 }
 
-func TransferirCacheMP(mp *MP, c *Cache, index int, posicao uint8) {
-	i := 0
-	for i < constantes.TAMANHO_BLOCO {
-		mp.Livros[index] = c.Linhas[posicao].Livros[i]
-		i++
-		index++
+func Transferir_Cache_MP(mp *MP, linha_cache *Linha, bloco int) {
+	for i := 0; i < constantes.TAMANHO_BLOCO; i++ {
+		mp.Livros[bloco*constantes.TAMANHO_BLOCO+i] = linha_cache.Livros[i]
 	}
 }

@@ -5,6 +5,7 @@ import (
 	"MESI/constantes"
 	"fmt"
 	"strconv"
+	"time"
 )
 
 func main() {
@@ -20,26 +21,31 @@ func main() {
 		linha := decide_linha()
 		leitura := decide_operacao()
 
+		var reserva componentes.Reserva
+		if !leitura {
+			reserva = ler_reserva(cache_num)
+		}
+
 		//componentes.Printa_Cache(bp.BP[constantes.Cache_escolhida_int].Cachezinha)
 		cache := &bp.BP[cache_num].Cachezinha
 
 		// componentes.Printa_Cache(*cache_escolhida)
-		cache_index := cache.Procura_Cache(linha)
+		cache_linha := cache.Procura_Cache(linha)
 
-		fmt.Printf("Cache index = %d", cache_index)
+		// fmt.Printf("Cache index = %d", cache_linha)
 		switch {
-		case cache_index >= 0 && leitura:
+		case cache_linha != nil && leitura && cache_linha.Mesi != componentes.I:
 			fmt.Println("Bloco encontrado na Cache! Read Hit")
 			cache.Read_Hit(linha)
-		case cache_index >= 0:
-			fmt.Println("Bloco encontrado na Cache! Write Hit")
-			//componentes.Write_Hit(&cache_escolhida, linha)
 		case leitura:
 			fmt.Println("Bloco não encontrado! Read Miss")
 			cache.Read_Miss(linha, &mp, &bp)
-		case cache_index < 0 && !leitura:
+		case cache_linha != nil && !leitura:
+			fmt.Println("Bloco encontrado na Cache! Write Hit")
+			cache.Write_Hit(linha, reserva, &mp, &bp)
+		case !leitura:
 			fmt.Println("Bloco não encontrado! Write Miss")
-			//return constantes.WM
+			cache.Write_Miss(linha, reserva, &mp, &bp)
 		default:
 			panic("Erro, não encontrada essa transação.")
 			// return -1
@@ -133,4 +139,44 @@ func decide_linha() int {
 	}
 	//fmt.Print(cache_escolhida_int)
 	return linha_escolhida_int
+}
+
+func ler_reserva(id_pessoa uint) componentes.Reserva {
+	var data_inicio, data_fim time.Time
+	var buffer string
+	var err error
+
+	for {
+		fmt.Printf("\nQual a data de início da reserva? Escreva da seguinte maneira (DD-MM-YYYY):\n")
+
+		for {
+			fmt.Scan(&buffer)
+			data_inicio, err = time.Parse(constantes.TIME_LAYOUT, buffer)
+
+			if err != nil {
+				fmt.Printf("\nInsira uma data válida (DD-MM-YYYY):\n")
+				continue
+			}
+			break
+		}
+
+		for {
+			fmt.Printf("\nQual a data de fim da reserva? Escreva da seguinte maneira (DD-MM-YYYY):\n")
+			fmt.Scan(&buffer)
+			data_fim, err = time.Parse(constantes.TIME_LAYOUT, buffer)
+
+			if err != nil {
+				fmt.Printf("\nInsira uma data válida (DD-MM-YYYY):\n")
+				continue
+			}
+			break
+		}
+
+		reserva, err := componentes.InicializaReserva(data_inicio, data_fim, id_pessoa)
+		if err != nil {
+			panic(err)
+		}
+
+		return reserva
+	}
 }

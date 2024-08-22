@@ -7,7 +7,6 @@ const (
 	E
 	S
 	I
-	UNDEFINED
 )
 
 type Tags = uint8
