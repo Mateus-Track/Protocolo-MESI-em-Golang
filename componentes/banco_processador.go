@@ -2,6 +2,7 @@ package componentes
 
 import (
 	"MESI/constantes"
+	"fmt"
 )
 
 type BancoProcessadores struct {
@@ -22,7 +23,8 @@ func InicializaBP(QUANTIDADE_USUARIOS int) BancoProcessadores {
 }
 
 func (bp *BancoProcessadores) Verificar_MESI(linha int) (bool, MesiFlags, *Linha) {
-	for _, p := range bp.BP {
+	for i := range bp.BP {
+		p := &bp.BP[i]
 		flag, linha_cache, err := p.Cachezinha.Status_Cache(linha)
 
 		if err == nil && flag != I {
@@ -67,8 +69,9 @@ func (bp *BancoProcessadores) Atualiza_Shared_Exclusive(linha int, cache_id int)
 
 		if cache.id_processador != cache_id {
 			linha_cache := cache.Procura_Cache(linha)
-
+			fmt.Print(linha_cache)
 			if linha_cache != nil {
+				fmt.Printf("NEM ENTREI AQ MANEW")
 				if linha_existente != nil {
 					println("mais de um")
 					return

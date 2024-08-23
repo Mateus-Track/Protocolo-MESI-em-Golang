@@ -65,6 +65,8 @@ func (cache *Cache) Procura_Cache(linha int) *Linha {
 
 	for i := 0; i < QUANTIDADE_LINHAS_CACHE; i++ {
 		if cache.Linhas[i].Bloco == bloco {
+			//linha_teste := &cache.Linhas[i]
+			//fmt.Print(linha_teste)
 			return &cache.Linhas[i]
 		}
 	}
@@ -112,11 +114,12 @@ func (cache *Cache) Carregar_Linha(livros [5]Livro, bloco int, mp *MP, bp *Banco
 	} else { //tirar da fila, dar append no final lá, retornar pra mp.
 		posicao = cache.Fila[0]
 		primeiraLinha := &cache.Linhas[posicao]
+		linha_retornar_mp := (primeiraLinha.Bloco) * 5
 
 		if primeiraLinha.Mesi == M {
 			Transferir_Cache_MP(mp, primeiraLinha, primeiraLinha.Bloco)
 		} else if primeiraLinha.Mesi == S {
-			bp.Atualiza_Shared_Exclusive(bloco*5, cache.id_processador)
+			bp.Atualiza_Shared_Exclusive(linha_retornar_mp, cache.id_processador)
 		}
 
 		cache.Fila = cache.Fila[1:]
@@ -132,10 +135,13 @@ func (cache *Cache) Carregar_Linha(livros [5]Livro, bloco int, mp *MP, bp *Banco
 
 func (cache *Cache) Read_Miss(linha int, mp *MP, bp *BancoProcessadores) {
 	bloco := linha / 5
+
+	var linha_escrita *Linha
+
 	encontrado, mesi_bp, linha_bp := bp.Verificar_MESI(linha)
 
 	if !encontrado {
-		linha_escrita := Transferir_MP_Cache(mp, cache, bp, bloco)
+		linha_escrita = Transferir_MP_Cache(mp, cache, bp, bloco)
 		linha_escrita.Mesi = E
 		cache.Printa_Cache()
 		return
@@ -143,31 +149,32 @@ func (cache *Cache) Read_Miss(linha int, mp *MP, bp *BancoProcessadores) {
 
 	switch mesi_bp {
 	case M:
-		fmt.Print("Achei um M mesmo.")
-		linha_escrita := cache.Carregar_Linha(linha_bp.Livros, bloco, mp, bp)
+		//fmt.Print("Achei um M mesmo.")
+		linha_escrita = cache.Carregar_Linha(linha_bp.Livros, bloco, mp, bp)
 		linha_escrita.Mesi = S
 
 		//linha_nova := cache.Carregar_Linha(linha_bp.Livros, bloco, mp, bp)
-		linha_bp.PrintLinha()
+		//linha_bp.PrintLinha()
 		linha_bp.Mesi = S
-		linha_bp.PrintLinha()
-		bp.BP[0].Cachezinha.Printa_Cache() //testando especificamente com escrever na CACHE 0 , puxar em outra, aí ele mostrou como ta na 0
+		//linha_bp.PrintLinha()
+		//bp.BP[0].Cachezinha.Printa_Cache() //testando especificamente com escrever na CACHE 0 , puxar em outra, aí ele mostrou como ta na 0
 		Transferir_Cache_MP(mp, linha_bp, bloco)
 
 	case E:
-		linha_escrita := Transferir_MP_Cache(mp, cache, bp, bloco)
+		linha_escrita = Transferir_MP_Cache(mp, cache, bp, bloco)
 		bp.Atualiza_Shared(linha, cache.id_processador)
 		linha_escrita.Mesi = S
 
 	case S:
-		linha_escrita := Transferir_MP_Cache(mp, cache, bp, bloco)
+		linha_escrita = Transferir_MP_Cache(mp, cache, bp, bloco)
 		linha_escrita.Mesi = S
 
 	default:
 		panic("Flag Inválida")
 	}
 
-	cache.Printa_Cache()
+	//cache.Printa_Cache()
+	linha_escrita.PrintLinha()
 }
 
 func (cache *Cache) Read_Hit(linha int) {
