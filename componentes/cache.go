@@ -172,6 +172,10 @@ func (cache *Cache) ReadMiss(linha int, mp *Memoria, bp *BancoProcessadores) {
 
 	//cache.Printa_Cache()
 	linha_escrita.Print()
+
+	livro := linha_escrita.Livros[linha%config.TAMANHO_BLOCO]
+	fmt.Printf("\nLivro buscado:\n")
+	fmt.Printf("%s", livro.ToString())
 }
 
 func (cache *Cache) ReadHit(linha int) {
