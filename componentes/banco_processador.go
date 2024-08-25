@@ -2,6 +2,7 @@ package componentes
 
 import (
 	"MESI/config"
+	MESI "MESI/types"
 	"errors"
 	"fmt"
 )
@@ -31,12 +32,12 @@ func (bp *BancoProcessadores) SelecionarProcessador(i int) (*Processador, error)
 	return &bp.processadores[i], nil
 }
 
-func (bp *BancoProcessadores) VerificarMESI(linha int) (bool, MesiFlags, *Linha) {
+func (bp *BancoProcessadores) VerificarMESI(linha int) (bool, MESI.MesiFlags, *Linha) {
 	for i := range bp.processadores {
 		p := &bp.processadores[i]
 		flag, linha_cache, err := p.Cachezinha.StatusCache(linha)
 
-		if err == nil && flag != I {
+		if err == nil && flag != MESI.I {
 			return true, flag, linha_cache
 		}
 	}
@@ -51,7 +52,7 @@ func (bp *BancoProcessadores) AtualizarShared(linha int, cache_id int) {
 		if cache.id_processador != cache_id {
 			linha_cache := cache.ProcurarLinha(linha)
 			if linha_cache != nil {
-				linha_cache.Mesi = S
+				linha_cache.Mesi = MESI.S
 			}
 		}
 	}
@@ -64,7 +65,7 @@ func (bp *BancoProcessadores) AtualizarInvalid(linha int, cache_id int) {
 		if cache.id_processador != cache_id {
 			linha_cache := cache.ProcurarLinha(linha)
 			if linha_cache != nil {
-				linha_cache.Mesi = I
+				linha_cache.Mesi = MESI.I
 			}
 		}
 	}
@@ -93,5 +94,5 @@ func (bp *BancoProcessadores) AtualizarSharedExclusive(linha int, cache_id int) 
 
 	println(linha_existente)
 
-	linha_existente.Mesi = E
+	linha_existente.Mesi = MESI.E
 }

@@ -2,6 +2,7 @@ package componentes
 
 import (
 	m "MESI/models"
+	MESI "MESI/types"
 	"fmt"
 )
 
@@ -20,7 +21,7 @@ func InicializaProcessador(id int) Processador {
 func (proc *Processador) RealizarLeitura(linha int, mp *Memoria, bp *BancoProcessadores) {
 	cache_linha := proc.Cachezinha.ProcurarLinha(linha)
 
-	if cache_linha != nil && cache_linha.Mesi != I {
+	if cache_linha != nil && cache_linha.Mesi != MESI.I {
 		fmt.Println("Bloco encontrado na Cache! Read Hit")
 		proc.Cachezinha.ReadHit(linha)
 	} else {

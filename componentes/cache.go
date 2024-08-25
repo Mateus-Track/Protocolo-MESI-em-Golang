@@ -3,6 +3,7 @@ package componentes
 import (
 	"MESI/config"
 	m "MESI/models"
+	MESI "MESI/types"
 	"errors"
 	"fmt"
 	"math/rand"
@@ -14,14 +15,14 @@ import (
 type Linha struct {
 	Livros [config.LINHAS_CACHE]m.Livro
 	Bloco  int //saber se o bloco foi puxado pra cache ou nao.
-	Mesi   MesiFlags
+	Mesi   MESI.MesiFlags
 }
 
 func InicializaLinha() Linha {
 	linha := Linha{
 		Livros: [config.LINHAS_CACHE]m.Livro{},
-		Bloco:  -1, // Valor inicial para o bloco
-		Mesi:   I,  // Valor inicial para MESI, meti o loco aq pra n começar em algum.	}
+		Bloco:  -1,     // Valor inicial para o bloco
+		Mesi:   MESI.I, // Valor inicial para MESI, meti o loco aq pra n começar em algum.	}
 	}
 
 	for i := range linha.Livros {
@@ -75,7 +76,7 @@ func (cache *Cache) ProcurarLinha(linha int) *Linha {
 	return nil
 }
 
-func (cache *Cache) StatusCache(linha int) (MesiFlags, *Linha, error) {
+func (cache *Cache) StatusCache(linha int) (MESI.MesiFlags, *Linha, error) {
 	linha_cache := cache.ProcurarLinha(linha)
 
 	if linha_cache == nil {
@@ -117,9 +118,9 @@ func (cache *Cache) CarregarLinha(livros [config.TAMANHO_BLOCO]m.Livro, bloco in
 		primeiraLinha := &cache.Linhas[posicao]
 		linha_retornar_mp := (primeiraLinha.Bloco) * config.TAMANHO_BLOCO
 
-		if primeiraLinha.Mesi == M {
+		if primeiraLinha.Mesi == MESI.M {
 			// mp.Transferir_Cache_MP(primeiraLinha, primeiraLinha.Bloco)
-		} else if primeiraLinha.Mesi == S {
+		} else if primeiraLinha.Mesi == MESI.S {
 			bp.AtualizarSharedExclusive(linha_retornar_mp, cache.id_processador)
 		}
 
@@ -143,27 +144,27 @@ func (cache *Cache) ReadMiss(linha int, mp *Memoria, bp *BancoProcessadores) {
 
 	if !encontrado {
 		linha_escrita = mp.Transferir_MP_Cache(cache, bp, bloco)
-		linha_escrita.Mesi = E
+		linha_escrita.Mesi = MESI.E
 		cache.Print()
 		return
 	}
 
 	switch mesi_bp {
-	case M:
+	case MESI.M:
 		linha_escrita = cache.CarregarLinha(linha_bp.Livros, bloco, mp, bp)
-		linha_escrita.Mesi = S
+		linha_escrita.Mesi = MESI.S
 
-		linha_bp.Mesi = S
+		linha_bp.Mesi = MESI.S
 		mp.Transferir_Cache_MP(linha_bp, bloco)
 
-	case E:
+	case MESI.E:
 		linha_escrita = mp.Transferir_MP_Cache(cache, bp, bloco)
 		bp.AtualizarShared(linha, cache.id_processador)
-		linha_escrita.Mesi = S
+		linha_escrita.Mesi = MESI.S
 
-	case S:
+	case MESI.S:
 		linha_escrita = mp.Transferir_MP_Cache(cache, bp, bloco)
-		linha_escrita.Mesi = S
+		linha_escrita.Mesi = MESI.S
 
 	default:
 		panic("Flag Inválida")
@@ -187,22 +188,22 @@ func (cache *Cache) WriteMiss(linha int, reserva m.Reserva, mp *Memoria, bp *Ban
 
 	if !encontrado {
 		linha_escrita := mp.Transferir_MP_Cache(cache, bp, bloco)
-		linha_escrita.Mesi = E
+		linha_escrita.Mesi = MESI.E
 	} else {
 		switch mesi_bp {
-		case M:
+		case MESI.M:
 			linha_escrita := cache.CarregarLinha(linha_bp.Livros, bloco, mp, bp)
-			linha_escrita.Mesi = S
+			linha_escrita.Mesi = MESI.S
 			mp.Transferir_Cache_MP(linha_bp, bloco)
 
-		case E:
+		case MESI.E:
 			linha_escrita := mp.Transferir_MP_Cache(cache, bp, bloco)
 			bp.AtualizarShared(linha, cache.id_processador)
-			linha_escrita.Mesi = S
+			linha_escrita.Mesi = MESI.S
 
-		case S:
+		case MESI.S:
 			linha_escrita := mp.Transferir_MP_Cache(cache, bp, bloco)
-			linha_escrita.Mesi = S
+			linha_escrita.Mesi = MESI.S
 
 		default:
 			panic("Flag Inválida")
@@ -212,8 +213,8 @@ func (cache *Cache) WriteMiss(linha int, reserva m.Reserva, mp *Memoria, bp *Ban
 	linha_cache := cache.ProcurarLinha(linha)
 	livro := &linha_cache.Livros[linha%config.TAMANHO_BLOCO]
 
-	if linha_cache.Mesi == E || linha_cache.Mesi == S {
-		linha_cache.Mesi = M
+	if linha_cache.Mesi == MESI.E || linha_cache.Mesi == MESI.S {
+		linha_cache.Mesi = MESI.M
 	}
 
 	bp.AtualizarInvalid(linha, cache.id_processador)
@@ -230,8 +231,8 @@ func (cache *Cache) WriteHit(linha int, reserva m.Reserva, mp *Memoria, bp *Banc
 	linha_cache := cache.ProcurarLinha(linha)
 	livro := &linha_cache.Livros[linha%config.TAMANHO_BLOCO]
 
-	if linha_cache.Mesi == E || linha_cache.Mesi == S {
-		linha_cache.Mesi = M
+	if linha_cache.Mesi == MESI.E || linha_cache.Mesi == MESI.S {
+		linha_cache.Mesi = MESI.M
 	}
 
 	bp.AtualizarInvalid(linha, cache.id_processador)
