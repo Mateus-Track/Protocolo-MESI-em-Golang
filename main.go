@@ -2,13 +2,11 @@ package main
 
 import (
 	"MESI/componentes"
+	"MESI/config"
 	"fmt"
 	"strconv"
 	"time"
 )
-
-const QUANTIDADE_LIVROS = 50
-const TIME_LAYOUT = "02-01-2006"
 
 func main() {
 	fmt.Println("Bem vindo à Biblioteca Matheus Meu Deus!")
@@ -99,12 +97,12 @@ func decidirOperacao() bool {
 func decidirLinha() int {
 	var linha_escolhida string
 
-	fmt.Printf("\nQual livro da biblioteca você gostaria de acessar? Selecione de 0 a %d\n", (QUANTIDADE_LIVROS - 1))
+	fmt.Printf("\nQual livro da biblioteca você gostaria de acessar? Selecione de 0 a %d\n", (config.QUANTIDADE_LIVROS - 1))
 	fmt.Scan(&linha_escolhida)
 	linha_escolhida_int, err := strconv.Atoi(linha_escolhida)
 
-	for linha_escolhida_int >= QUANTIDADE_LIVROS || linha_escolhida_int < 0 || err != nil {
-		fmt.Printf("Livro inexistente! Selecione um livro válido, de 0 a %d\n", (QUANTIDADE_LIVROS - 1))
+	for linha_escolhida_int >= config.QUANTIDADE_LIVROS || linha_escolhida_int < 0 || err != nil {
+		fmt.Printf("Livro inexistente! Selecione um livro válido, de 0 a %d\n", (config.QUANTIDADE_LIVROS - 1))
 		fmt.Scan(&linha_escolhida)
 		linha_escolhida_int, err = strconv.Atoi(linha_escolhida)
 	}
@@ -122,7 +120,7 @@ func lerReserva(proc *componentes.Processador) componentes.Reserva {
 
 		for {
 			fmt.Scan(&buffer)
-			data_inicio, err = time.Parse(TIME_LAYOUT, buffer)
+			data_inicio, err = time.Parse(config.TIME_LAYOUT, buffer)
 
 			if err != nil {
 				fmt.Printf("\nInsira uma data válida (DD-MM-YYYY):\n")
@@ -134,7 +132,7 @@ func lerReserva(proc *componentes.Processador) componentes.Reserva {
 		for {
 			fmt.Printf("\nQual a data de fim da reserva? Escreva da seguinte maneira (DD-MM-YYYY):\n")
 			fmt.Scan(&buffer)
-			data_fim, err = time.Parse(TIME_LAYOUT, buffer)
+			data_fim, err = time.Parse(config.TIME_LAYOUT, buffer)
 
 			if err != nil {
 				fmt.Printf("\nInsira uma data válida (DD-MM-YYYY):\n")
