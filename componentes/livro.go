@@ -1,11 +1,12 @@
 package componentes
 
 import (
-	"MESI/constantes"
 	"errors"
 	"fmt"
 	"time"
 )
+
+const TIME_LAYOUT = "02-01-2006"
 
 type Reserva struct {
 	data_inicio time.Time
@@ -28,9 +29,9 @@ func InicializaReserva(data_inicio, data_fim time.Time, id_pessoa int) (Reserva,
 func (reserva *Reserva) ToString() string {
 	var str = ""
 
-	str += reserva.data_inicio.Format(constantes.TIME_LAYOUT) +
+	str += reserva.data_inicio.Format(TIME_LAYOUT) +
 		" até " +
-		reserva.data_fim.Format(constantes.TIME_LAYOUT)
+		reserva.data_fim.Format(TIME_LAYOUT)
 
 	return str
 }

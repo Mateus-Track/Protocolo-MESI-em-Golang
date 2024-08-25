@@ -2,13 +2,13 @@ package main
 
 import (
 	"MESI/componentes"
-	"MESI/constantes"
 	"fmt"
 	"strconv"
 	"time"
 )
 
 const QUANTIDADE_LIVROS = 50
+const TIME_LAYOUT = "02-01-2006"
 
 func main() {
 	fmt.Println("Bem vindo à Biblioteca Matheus Meu Deus!")
@@ -122,7 +122,7 @@ func lerReserva(proc *componentes.Processador) componentes.Reserva {
 
 		for {
 			fmt.Scan(&buffer)
-			data_inicio, err = time.Parse(constantes.TIME_LAYOUT, buffer)
+			data_inicio, err = time.Parse(TIME_LAYOUT, buffer)
 
 			if err != nil {
 				fmt.Printf("\nInsira uma data válida (DD-MM-YYYY):\n")
@@ -134,7 +134,7 @@ func lerReserva(proc *componentes.Processador) componentes.Reserva {
 		for {
 			fmt.Printf("\nQual a data de fim da reserva? Escreva da seguinte maneira (DD-MM-YYYY):\n")
 			fmt.Scan(&buffer)
-			data_fim, err = time.Parse(constantes.TIME_LAYOUT, buffer)
+			data_fim, err = time.Parse(TIME_LAYOUT, buffer)
 
 			if err != nil {
 				fmt.Printf("\nInsira uma data válida (DD-MM-YYYY):\n")
