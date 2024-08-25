@@ -41,7 +41,7 @@ type Livro struct {
 	Secao    string
 }
 
-func InicializaLivro() Livro {
+func InicializarLivro() Livro {
 	return Livro{
 		Reservas: []Reserva{},
 		Nome:     "",

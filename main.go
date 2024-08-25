@@ -3,6 +3,7 @@ package main
 import (
 	"MESI/componentes"
 	"MESI/config"
+	m "MESI/models"
 	"fmt"
 	"strconv"
 	"time"
@@ -110,7 +111,7 @@ func decidirLinha() int {
 	return linha_escolhida_int
 }
 
-func lerReserva(proc *componentes.Processador) componentes.Reserva {
+func lerReserva(proc *componentes.Processador) m.Reserva {
 	var data_inicio, data_fim time.Time
 	var buffer string
 	var err error
@@ -141,7 +142,7 @@ func lerReserva(proc *componentes.Processador) componentes.Reserva {
 			break
 		}
 
-		reserva, err := componentes.InicializaReserva(data_inicio, data_fim, proc.Id)
+		reserva, err := m.InicializaReserva(data_inicio, data_fim, proc.Id)
 		if err != nil {
 			panic(err)
 		}

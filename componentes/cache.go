@@ -2,6 +2,7 @@ package componentes
 
 import (
 	"MESI/config"
+	m "MESI/models"
 	"errors"
 	"fmt"
 	"math/rand"
@@ -11,20 +12,20 @@ import (
 //--Linha-----------------------------------------------------------------------
 
 type Linha struct {
-	Livros [config.LINHAS_CACHE]Livro
+	Livros [config.LINHAS_CACHE]m.Livro
 	Bloco  int //saber se o bloco foi puxado pra cache ou nao.
 	Mesi   MesiFlags
 }
 
 func InicializaLinha() Linha {
 	linha := Linha{
-		Livros: [config.LINHAS_CACHE]Livro{},
+		Livros: [config.LINHAS_CACHE]m.Livro{},
 		Bloco:  -1, // Valor inicial para o bloco
 		Mesi:   I,  // Valor inicial para MESI, meti o loco aq pra n começar em algum.	}
 	}
 
 	for i := range linha.Livros {
-		linha.Livros[i] = InicializaLivro()
+		linha.Livros[i] = m.InicializarLivro()
 	}
 	return linha
 }
@@ -97,7 +98,7 @@ func (cache *Cache) Print() { //sem a fila por enquanto.
 	}
 }
 
-func (cache *Cache) CarregarLinha(livros [config.TAMANHO_BLOCO]Livro, bloco int, mp *Memoria, bp *BancoProcessadores) *Linha {
+func (cache *Cache) CarregarLinha(livros [config.TAMANHO_BLOCO]m.Livro, bloco int, mp *Memoria, bp *BancoProcessadores) *Linha {
 	var posicao uint8
 
 	linha_existe := cache.ProcurarLinha(bloco * config.TAMANHO_BLOCO)
@@ -180,7 +181,7 @@ func (cache *Cache) ReadHit(linha int) {
 	fmt.Printf("MESI do bloco: %d\n", linha_cache.Mesi)
 }
 
-func (cache *Cache) WriteMiss(linha int, reserva Reserva, mp *Memoria, bp *BancoProcessadores) {
+func (cache *Cache) WriteMiss(linha int, reserva m.Reserva, mp *Memoria, bp *BancoProcessadores) {
 	bloco := linha / config.TAMANHO_BLOCO
 	encontrado, mesi_bp, linha_bp := bp.VerificarMESI(linha)
 
@@ -225,7 +226,7 @@ func (cache *Cache) WriteMiss(linha int, reserva Reserva, mp *Memoria, bp *Banco
 	fmt.Printf("MESI do bloco: %d\n", linha_cache.Mesi)
 }
 
-func (cache *Cache) WriteHit(linha int, reserva Reserva, mp *Memoria, bp *BancoProcessadores) {
+func (cache *Cache) WriteHit(linha int, reserva m.Reserva, mp *Memoria, bp *BancoProcessadores) {
 	linha_cache := cache.ProcurarLinha(linha)
 	livro := &linha_cache.Livros[linha%config.TAMANHO_BLOCO]
 

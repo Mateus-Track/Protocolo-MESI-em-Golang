@@ -2,18 +2,19 @@ package componentes
 
 import (
 	"MESI/config"
+	m "MESI/models"
 	"fmt"
 )
 
 //--Memoria---------------------------------------------------------------------
 
 type Memoria struct { //pelo menos 50 posições;
-	livros [config.QUANTIDADE_LIVROS]Livro
+	livros [config.QUANTIDADE_LIVROS]m.Livro
 }
 
 func InicializaMemoria() Memoria {
 	mp := Memoria{
-		livros: [config.QUANTIDADE_LIVROS]Livro{},
+		livros: [config.QUANTIDADE_LIVROS]m.Livro{},
 	}
 
 	return mp
@@ -36,8 +37,8 @@ func (mp *Memoria) PreencherLivros() {
 	for i := 0; i < config.QUANTIDADE_LIVROS; i++ {
 		secao := secoes[i/config.TAMANHO_BLOCO]
 		nome := fmt.Sprintf("Livro %d", i)
-		mp.livros[i] = Livro{
-			Reservas: []Reserva{},
+		mp.livros[i] = m.Livro{
+			Reservas: []m.Reserva{},
 			Nome:     nome,
 			Secao:    secao,
 		}
@@ -50,14 +51,14 @@ func (mp *Memoria) Print() {
 	}
 }
 
-func (mp *Memoria) GuardarLinha(bloco int, livros [config.TAMANHO_BLOCO]Livro) {
+func (mp *Memoria) GuardarLinha(bloco int, livros [config.TAMANHO_BLOCO]m.Livro) {
 	for i := 0; i < config.TAMANHO_BLOCO; i++ {
 		mp.livros[bloco*config.TAMANHO_BLOCO+1] = livros[i]
 	}
 }
 
-func (mp *Memoria) CarregarLinha(bloco int) [config.TAMANHO_BLOCO]Livro {
-	linha_mp := [config.TAMANHO_BLOCO]Livro{}
+func (mp *Memoria) CarregarLinha(bloco int) [config.TAMANHO_BLOCO]m.Livro {
+	linha_mp := [config.TAMANHO_BLOCO]m.Livro{}
 
 	for i := 0; i < config.TAMANHO_BLOCO; i++ {
 		linha_mp[i] = mp.livros[bloco*config.TAMANHO_BLOCO+i]
@@ -67,7 +68,7 @@ func (mp *Memoria) CarregarLinha(bloco int) [config.TAMANHO_BLOCO]Livro {
 }
 
 func (mp *Memoria) Transferir_MP_Cache(cache *Cache, bp *BancoProcessadores, bloco int) *Linha {
-	linha_mp := [config.TAMANHO_BLOCO]Livro{}
+	linha_mp := [config.TAMANHO_BLOCO]m.Livro{}
 
 	for i := 0; i < config.TAMANHO_BLOCO; i++ {
 		linha_mp[i] = mp.livros[bloco*config.TAMANHO_BLOCO+i]

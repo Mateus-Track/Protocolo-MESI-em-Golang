@@ -1,6 +1,9 @@
 package componentes
 
-import "fmt"
+import (
+	m "MESI/models"
+	"fmt"
+)
 
 type Processador struct {
 	Id         int
@@ -26,7 +29,7 @@ func (proc *Processador) RealizarLeitura(linha int, mp *Memoria, bp *BancoProces
 	}
 }
 
-func (proc *Processador) RealizarEscrita(linha int, reserva Reserva, mp *Memoria, bp *BancoProcessadores) {
+func (proc *Processador) RealizarEscrita(linha int, reserva m.Reserva, mp *Memoria, bp *BancoProcessadores) {
 	cache_linha := proc.Cachezinha.ProcurarLinha(linha)
 
 	if cache_linha != nil {
