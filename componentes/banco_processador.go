@@ -1,19 +1,18 @@
 package componentes
 
 import (
+	"MESI/config"
 	"errors"
 	"fmt"
 )
 
-const QUANTIDADE_USUARIOS = 4
-
 type BancoProcessadores struct {
-	processadores [4]Processador
+	processadores [config.QUANTIDADE_PROCESSADORES]Processador
 }
 
 func InicializaBP() BancoProcessadores {
 	bp := BancoProcessadores{
-		processadores: [4]Processador{},
+		processadores: [config.QUANTIDADE_PROCESSADORES]Processador{},
 	}
 
 	// Inicializar cada Processador dentro do Banco

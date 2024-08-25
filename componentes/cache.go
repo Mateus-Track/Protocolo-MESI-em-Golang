@@ -1,25 +1,24 @@
 package componentes
 
 import (
+	"MESI/config"
 	"errors"
 	"fmt"
 	"math/rand"
 	"time"
 )
 
-const QUANTIDADE_LINHAS_CACHE = 5
-
 //--Linha-----------------------------------------------------------------------
 
 type Linha struct {
-	Livros [QUANTIDADE_LINHAS_CACHE]Livro
+	Livros [config.LINHAS_CACHE]Livro
 	Bloco  int //saber se o bloco foi puxado pra cache ou nao.
 	Mesi   MesiFlags
 }
 
 func InicializaLinha() Linha {
 	linha := Linha{
-		Livros: [QUANTIDADE_LINHAS_CACHE]Livro{},
+		Livros: [config.LINHAS_CACHE]Livro{},
 		Bloco:  -1, // Valor inicial para o bloco
 		Mesi:   I,  // Valor inicial para MESI, meti o loco aq pra n começar em algum.	}
 	}
@@ -44,14 +43,14 @@ func (l Linha) Print() {
 
 type Cache struct { //pelo menos 5 posições.
 	id_processador int
-	Linhas         [QUANTIDADE_LINHAS_CACHE]Linha //acredito que serão as mesmas linhas, só uma cópia da MP.
+	Linhas         [config.LINHAS_CACHE]Linha //acredito que serão as mesmas linhas, só uma cópia da MP.
 	Fila           []uint8
 }
 
 func InicializaCache(id int) Cache {
 	cache := Cache{
 		id_processador: id,
-		Linhas:         [QUANTIDADE_LINHAS_CACHE]Linha{},
+		Linhas:         [config.LINHAS_CACHE]Linha{},
 		Fila:           []uint8{},
 	}
 
@@ -64,9 +63,9 @@ func InicializaCache(id int) Cache {
 }
 
 func (cache *Cache) ProcurarLinha(linha int) *Linha {
-	bloco := linha / 5
+	bloco := linha / config.TAMANHO_BLOCO
 
-	for i := 0; i < QUANTIDADE_LINHAS_CACHE; i++ {
+	for i := 0; i < config.LINHAS_CACHE; i++ {
 		if cache.Linhas[i].Bloco == bloco {
 			return &cache.Linhas[i]
 		}
@@ -86,11 +85,11 @@ func (cache *Cache) StatusCache(linha int) (MesiFlags, *Linha, error) {
 }
 
 func (cache *Cache) Print() { //sem a fila por enquanto.
-	for i := 0; i < QUANTIDADE_LINHAS_CACHE; i++ {
+	for i := 0; i < config.LINHAS_CACHE; i++ {
 		fmt.Printf("Linha da Cache de número %d:\n\n", i+1)
 		fmt.Printf("MESI da linha = %d\n", cache.Linhas[i].Mesi)
 
-		for j := 0; j < len(cache.Linhas); j++ {
+		for j := 0; j < config.TAMANHO_BLOCO; j++ {
 			fmt.Printf("Livro armazenado:\n")
 			fmt.Printf("%s", cache.Linhas[i].Livros[j].ToString())
 		}
@@ -98,10 +97,10 @@ func (cache *Cache) Print() { //sem a fila por enquanto.
 	}
 }
 
-func (cache *Cache) CarregarLinha(livros [QUANTIDADE_LINHAS_CACHE]Livro, bloco int, mp *Memoria, bp *BancoProcessadores) *Linha {
+func (cache *Cache) CarregarLinha(livros [config.TAMANHO_BLOCO]Livro, bloco int, mp *Memoria, bp *BancoProcessadores) *Linha {
 	var posicao uint8
 
-	linha_existe := cache.ProcurarLinha(bloco * 5)
+	linha_existe := cache.ProcurarLinha(bloco * config.TAMANHO_BLOCO)
 
 	if linha_existe != nil {
 		linha_existe.Livros = livros
@@ -115,7 +114,7 @@ func (cache *Cache) CarregarLinha(livros [QUANTIDADE_LINHAS_CACHE]Livro, bloco i
 	} else { //tirar da fila, dar append no final lá, retornar pra mp.
 		posicao = cache.Fila[0]
 		primeiraLinha := &cache.Linhas[posicao]
-		linha_retornar_mp := (primeiraLinha.Bloco) * 5
+		linha_retornar_mp := (primeiraLinha.Bloco) * config.TAMANHO_BLOCO
 
 		if primeiraLinha.Mesi == M {
 			// mp.Transferir_Cache_MP(primeiraLinha, primeiraLinha.Bloco)
@@ -135,7 +134,7 @@ func (cache *Cache) CarregarLinha(livros [QUANTIDADE_LINHAS_CACHE]Livro, bloco i
 }
 
 func (cache *Cache) ReadMiss(linha int, mp *Memoria, bp *BancoProcessadores) {
-	bloco := linha / 5
+	bloco := linha / config.TAMANHO_BLOCO
 
 	var linha_escrita *Linha
 
@@ -175,14 +174,14 @@ func (cache *Cache) ReadMiss(linha int, mp *Memoria, bp *BancoProcessadores) {
 
 func (cache *Cache) ReadHit(linha int) {
 	linha_cache := cache.ProcurarLinha(linha)
-	livro := linha_cache.Livros[linha%5]
+	livro := linha_cache.Livros[linha%config.TAMANHO_BLOCO]
 
 	fmt.Printf("%s", livro.ToString())
 	fmt.Printf("MESI do bloco: %d\n", linha_cache.Mesi)
 }
 
 func (cache *Cache) WriteMiss(linha int, reserva Reserva, mp *Memoria, bp *BancoProcessadores) {
-	bloco := linha / 5
+	bloco := linha / config.TAMANHO_BLOCO
 	encontrado, mesi_bp, linha_bp := bp.VerificarMESI(linha)
 
 	if !encontrado {
@@ -210,7 +209,7 @@ func (cache *Cache) WriteMiss(linha int, reserva Reserva, mp *Memoria, bp *Banco
 	}
 
 	linha_cache := cache.ProcurarLinha(linha)
-	livro := &linha_cache.Livros[linha%5]
+	livro := &linha_cache.Livros[linha%config.TAMANHO_BLOCO]
 
 	if linha_cache.Mesi == E || linha_cache.Mesi == S {
 		linha_cache.Mesi = M
@@ -228,7 +227,7 @@ func (cache *Cache) WriteMiss(linha int, reserva Reserva, mp *Memoria, bp *Banco
 
 func (cache *Cache) WriteHit(linha int, reserva Reserva, mp *Memoria, bp *BancoProcessadores) {
 	linha_cache := cache.ProcurarLinha(linha)
-	livro := &linha_cache.Livros[linha%5]
+	livro := &linha_cache.Livros[linha%config.TAMANHO_BLOCO]
 
 	if linha_cache.Mesi == E || linha_cache.Mesi == S {
 		linha_cache.Mesi = M
@@ -244,7 +243,7 @@ func (cache *Cache) WriteHit(linha int, reserva Reserva, mp *Memoria, bp *BancoP
 }
 
 func (c *Cache) TemEspacoLivre() bool {
-	return len(c.Fila) < QUANTIDADE_LINHAS_CACHE
+	return len(c.Fila) < config.LINHAS_CACHE
 }
 
 func (c *Cache) ValoresDisponiveis() []uint8 { // n entendi totalmente.

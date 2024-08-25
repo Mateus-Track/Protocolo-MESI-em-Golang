@@ -1,21 +1,19 @@
 package componentes
 
 import (
+	"MESI/config"
 	"fmt"
 )
-
-const TAMANHO_BLOCO = 5
 
 //--Memoria---------------------------------------------------------------------
 
 type Memoria struct { //pelo menos 50 posições;
-	livros [50]Livro
-	// Tags   [10]MesiFlags //guardar na MP as tags, facilitar.
+	livros [config.QUANTIDADE_LIVROS]Livro
 }
 
 func InicializaMemoria() Memoria {
 	mp := Memoria{
-		livros: [50]Livro{},
+		livros: [config.QUANTIDADE_LIVROS]Livro{},
 	}
 
 	return mp
@@ -35,8 +33,8 @@ func (mp *Memoria) PreencherLivros() {
 		"Psicologia",
 	}
 
-	for i := 0; i < 50; i++ {
-		secao := secoes[i/5]
+	for i := 0; i < config.QUANTIDADE_LIVROS; i++ {
+		secao := secoes[i/config.TAMANHO_BLOCO]
 		nome := fmt.Sprintf("Livro %d", i)
 		mp.livros[i] = Livro{
 			Reservas: []Reserva{},
@@ -52,34 +50,34 @@ func (mp *Memoria) Print() {
 	}
 }
 
-func (mp *Memoria) GuardarLinha(bloco int, livros [TAMANHO_BLOCO]Livro) {
-	for i := 0; i < TAMANHO_BLOCO; i++ {
-		mp.livros[bloco*TAMANHO_BLOCO+1] = livros[i]
+func (mp *Memoria) GuardarLinha(bloco int, livros [config.TAMANHO_BLOCO]Livro) {
+	for i := 0; i < config.TAMANHO_BLOCO; i++ {
+		mp.livros[bloco*config.TAMANHO_BLOCO+1] = livros[i]
 	}
 }
 
-func (mp *Memoria) CarregarLinha(bloco int) [TAMANHO_BLOCO]Livro {
-	linha_mp := [TAMANHO_BLOCO]Livro{}
+func (mp *Memoria) CarregarLinha(bloco int) [config.TAMANHO_BLOCO]Livro {
+	linha_mp := [config.TAMANHO_BLOCO]Livro{}
 
-	for i := 0; i < TAMANHO_BLOCO; i++ {
-		linha_mp[i] = mp.livros[bloco*TAMANHO_BLOCO+i]
+	for i := 0; i < config.TAMANHO_BLOCO; i++ {
+		linha_mp[i] = mp.livros[bloco*config.TAMANHO_BLOCO+i]
 	}
 
 	return linha_mp
 }
 
 func (mp *Memoria) Transferir_MP_Cache(cache *Cache, bp *BancoProcessadores, bloco int) *Linha {
-	linha_mp := [TAMANHO_BLOCO]Livro{}
+	linha_mp := [config.TAMANHO_BLOCO]Livro{}
 
-	for i := 0; i < TAMANHO_BLOCO; i++ {
-		linha_mp[i] = mp.livros[bloco*TAMANHO_BLOCO+i]
+	for i := 0; i < config.TAMANHO_BLOCO; i++ {
+		linha_mp[i] = mp.livros[bloco*config.TAMANHO_BLOCO+i]
 	}
 
 	return cache.CarregarLinha(linha_mp, bloco, mp, bp)
 }
 
 func (mp *Memoria) Transferir_Cache_MP(linha_cache *Linha, bloco int) {
-	for i := 0; i < TAMANHO_BLOCO; i++ {
-		mp.livros[bloco*TAMANHO_BLOCO+i] = linha_cache.Livros[i]
+	for i := 0; i < config.TAMANHO_BLOCO; i++ {
+		mp.livros[bloco*config.TAMANHO_BLOCO+i] = linha_cache.Livros[i]
 	}
 }
