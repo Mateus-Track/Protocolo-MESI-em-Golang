@@ -8,6 +8,8 @@ import (
 	"time"
 )
 
+const QUANTIDADE_LIVROS = 50
+
 func main() {
 	fmt.Println("Bem vindo à Biblioteca Matheus Meu Deus!")
 
@@ -97,12 +99,12 @@ func decidirOperacao() bool {
 func decidirLinha() int {
 	var linha_escolhida string
 
-	fmt.Printf("\nQual livro da biblioteca você gostaria de acessar? Selecione de 0 a %d\n", (constantes.QUANTIDADE_LIVROS - 1))
+	fmt.Printf("\nQual livro da biblioteca você gostaria de acessar? Selecione de 0 a %d\n", (QUANTIDADE_LIVROS - 1))
 	fmt.Scan(&linha_escolhida)
 	linha_escolhida_int, err := strconv.Atoi(linha_escolhida)
 
-	for linha_escolhida_int >= constantes.QUANTIDADE_LIVROS || linha_escolhida_int < 0 || err != nil {
-		fmt.Printf("Livro inexistente! Selecione um livro válido, de 0 a %d\n", (constantes.QUANTIDADE_LIVROS - 1))
+	for linha_escolhida_int >= QUANTIDADE_LIVROS || linha_escolhida_int < 0 || err != nil {
+		fmt.Printf("Livro inexistente! Selecione um livro válido, de 0 a %d\n", (QUANTIDADE_LIVROS - 1))
 		fmt.Scan(&linha_escolhida)
 		linha_escolhida_int, err = strconv.Atoi(linha_escolhida)
 	}

@@ -1,9 +1,10 @@
 package componentes
 
 import (
-	"MESI/constantes"
 	"fmt"
 )
+
+const TAMANHO_BLOCO = 5
 
 //--Memoria---------------------------------------------------------------------
 
@@ -51,34 +52,34 @@ func (mp *Memoria) Print() {
 	}
 }
 
-func (mp *Memoria) GuardarLinha(bloco int, livros [constantes.TAMANHO_BLOCO]Livro) {
-	for i := 0; i < constantes.TAMANHO_BLOCO; i++ {
-		mp.livros[bloco*constantes.TAMANHO_BLOCO+1] = livros[i]
+func (mp *Memoria) GuardarLinha(bloco int, livros [TAMANHO_BLOCO]Livro) {
+	for i := 0; i < TAMANHO_BLOCO; i++ {
+		mp.livros[bloco*TAMANHO_BLOCO+1] = livros[i]
 	}
 }
 
-func (mp *Memoria) CarregarLinha(bloco int) [constantes.TAMANHO_BLOCO]Livro {
-	linha_mp := [constantes.TAMANHO_BLOCO]Livro{}
+func (mp *Memoria) CarregarLinha(bloco int) [TAMANHO_BLOCO]Livro {
+	linha_mp := [TAMANHO_BLOCO]Livro{}
 
-	for i := 0; i < constantes.TAMANHO_BLOCO; i++ {
-		linha_mp[i] = mp.livros[bloco*constantes.TAMANHO_BLOCO+i]
+	for i := 0; i < TAMANHO_BLOCO; i++ {
+		linha_mp[i] = mp.livros[bloco*TAMANHO_BLOCO+i]
 	}
 
 	return linha_mp
 }
 
 func (mp *Memoria) Transferir_MP_Cache(cache *Cache, bp *BancoProcessadores, bloco int) *Linha {
-	linha_mp := [constantes.TAMANHO_BLOCO]Livro{}
+	linha_mp := [TAMANHO_BLOCO]Livro{}
 
-	for i := 0; i < constantes.TAMANHO_BLOCO; i++ {
-		linha_mp[i] = mp.livros[bloco*constantes.TAMANHO_BLOCO+i]
+	for i := 0; i < TAMANHO_BLOCO; i++ {
+		linha_mp[i] = mp.livros[bloco*TAMANHO_BLOCO+i]
 	}
 
 	return cache.CarregarLinha(linha_mp, bloco, mp, bp)
 }
 
 func (mp *Memoria) Transferir_Cache_MP(linha_cache *Linha, bloco int) {
-	for i := 0; i < constantes.TAMANHO_BLOCO; i++ {
-		mp.livros[bloco*constantes.TAMANHO_BLOCO+i] = linha_cache.Livros[i]
+	for i := 0; i < TAMANHO_BLOCO; i++ {
+		mp.livros[bloco*TAMANHO_BLOCO+i] = linha_cache.Livros[i]
 	}
 }

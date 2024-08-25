@@ -1,7 +1,6 @@
 package componentes
 
 import (
-	"MESI/constantes"
 	"errors"
 	"fmt"
 	"math/rand"
@@ -13,14 +12,14 @@ const QUANTIDADE_LINHAS_CACHE = 5
 //--Linha-----------------------------------------------------------------------
 
 type Linha struct {
-	Livros [5]Livro
+	Livros [QUANTIDADE_LINHAS_CACHE]Livro
 	Bloco  int //saber se o bloco foi puxado pra cache ou nao.
 	Mesi   MesiFlags
 }
 
 func InicializaLinha() Linha {
 	linha := Linha{
-		Livros: [5]Livro{},
+		Livros: [QUANTIDADE_LINHAS_CACHE]Livro{},
 		Bloco:  -1, // Valor inicial para o bloco
 		Mesi:   I,  // Valor inicial para MESI, meti o loco aq pra n começar em algum.	}
 	}
@@ -52,7 +51,7 @@ type Cache struct { //pelo menos 5 posições.
 func InicializaCache(id int) Cache {
 	cache := Cache{
 		id_processador: id,
-		Linhas:         [5]Linha{},
+		Linhas:         [QUANTIDADE_LINHAS_CACHE]Linha{},
 		Fila:           []uint8{},
 	}
 
@@ -90,16 +89,16 @@ func (cache *Cache) Print() { //sem a fila por enquanto.
 	for i := 0; i < QUANTIDADE_LINHAS_CACHE; i++ {
 		fmt.Printf("Linha da Cache de número %d:\n\n", i+1)
 		fmt.Printf("MESI da linha = %d\n", cache.Linhas[i].Mesi)
-		for j := 0; j < constantes.TAMANHO_BLOCO; j++ {
+
+		for j := 0; j < len(cache.Linhas); j++ {
 			fmt.Printf("Livro armazenado:\n")
 			fmt.Printf("%s", cache.Linhas[i].Livros[j].ToString())
-			//cache.Linhas[i].PrintLinha()
 		}
 		fmt.Printf("\n")
 	}
 }
 
-func (cache *Cache) CarregarLinha(livros [5]Livro, bloco int, mp *Memoria, bp *BancoProcessadores) *Linha {
+func (cache *Cache) CarregarLinha(livros [QUANTIDADE_LINHAS_CACHE]Livro, bloco int, mp *Memoria, bp *BancoProcessadores) *Linha {
 	var posicao uint8
 
 	linha_existe := cache.ProcurarLinha(bloco * 5)
