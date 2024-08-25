@@ -10,14 +10,10 @@ import (
 type Reserva struct {
 	data_inicio time.Time
 	data_fim    time.Time
-	id_pessoa   uint
+	id_pessoa   int
 }
 
-func InicializaReserva(data_inicio, data_fim time.Time, id_pessoa uint) (Reserva, error) {
-	if id_pessoa >= constantes.QUANTIDADE_USUARIOS {
-		return Reserva{}, errors.New("InvalidUser")
-	}
-
+func InicializaReserva(data_inicio, data_fim time.Time, id_pessoa int) (Reserva, error) {
 	if data_inicio.After(data_fim) {
 		return Reserva{}, errors.New("InvalidDate")
 	}

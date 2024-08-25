@@ -10,6 +10,8 @@ import (
 
 const QUANTIDADE_LINHAS_CACHE = 5
 
+//--Linha-----------------------------------------------------------------------
+
 type Linha struct {
 	Livros [5]Livro
 	Bloco  int //saber se o bloco foi puxado pra cache ou nao.
@@ -29,7 +31,7 @@ func InicializaLinha() Linha {
 	return linha
 }
 
-func (l Linha) PrintLinha() {
+func (l Linha) Print() {
 	fmt.Println("Linha:")
 	for i, livro := range l.Livros {
 		fmt.Printf("  Livro %d: %s\n", i+1, livro.Nome)
@@ -38,6 +40,8 @@ func (l Linha) PrintLinha() {
 	fmt.Printf("  Bloco: %d\n", l.Bloco)
 	fmt.Printf("  MESI: %d\n", l.Mesi)
 }
+
+//--Cache-----------------------------------------------------------------------
 
 type Cache struct { //pelo menos 5 posições.
 	id_processador int
@@ -60,13 +64,11 @@ func InicializaCache(id int) Cache {
 	return cache
 }
 
-func (cache *Cache) Procura_Cache(linha int) *Linha {
+func (cache *Cache) ProcurarLinha(linha int) *Linha {
 	bloco := linha / 5
 
 	for i := 0; i < QUANTIDADE_LINHAS_CACHE; i++ {
 		if cache.Linhas[i].Bloco == bloco {
-			//linha_teste := &cache.Linhas[i]
-			//fmt.Print(linha_teste)
 			return &cache.Linhas[i]
 		}
 	}
@@ -74,8 +76,8 @@ func (cache *Cache) Procura_Cache(linha int) *Linha {
 	return nil
 }
 
-func (cache *Cache) Status_Cache(linha int) (MesiFlags, *Linha, error) {
-	linha_cache := cache.Procura_Cache(linha)
+func (cache *Cache) StatusCache(linha int) (MesiFlags, *Linha, error) {
+	linha_cache := cache.ProcurarLinha(linha)
 
 	if linha_cache == nil {
 		return 0, nil, errors.New("CacheUndefined")
@@ -84,7 +86,7 @@ func (cache *Cache) Status_Cache(linha int) (MesiFlags, *Linha, error) {
 	return linha_cache.Mesi, linha_cache, nil
 }
 
-func (cache *Cache) Printa_Cache() { //sem a fila por enquanto.
+func (cache *Cache) Print() { //sem a fila por enquanto.
 	for i := 0; i < QUANTIDADE_LINHAS_CACHE; i++ {
 		fmt.Printf("Linha da Cache de número %d:\n\n", i+1)
 		fmt.Printf("MESI da linha = %d\n", cache.Linhas[i].Mesi)
@@ -97,10 +99,10 @@ func (cache *Cache) Printa_Cache() { //sem a fila por enquanto.
 	}
 }
 
-func (cache *Cache) Carregar_Linha(livros [5]Livro, bloco int, mp *MP, bp *BancoProcessadores) *Linha {
+func (cache *Cache) CarregarLinha(livros [5]Livro, bloco int, mp *Memoria, bp *BancoProcessadores) *Linha {
 	var posicao uint8
 
-	linha_existe := cache.Procura_Cache(bloco * 5)
+	linha_existe := cache.ProcurarLinha(bloco * 5)
 
 	if linha_existe != nil {
 		linha_existe.Livros = livros
@@ -109,7 +111,7 @@ func (cache *Cache) Carregar_Linha(livros [5]Livro, bloco int, mp *MP, bp *Banco
 
 	if cache.TemEspacoLivre() {
 		disponiveis := cache.ValoresDisponiveis()
-		numero_random := Gerar_Aleatorio(len(disponiveis))
+		numero_random := GerarAleatorio(len(disponiveis))
 		posicao = disponiveis[numero_random]
 	} else { //tirar da fila, dar append no final lá, retornar pra mp.
 		posicao = cache.Fila[0]
@@ -117,9 +119,9 @@ func (cache *Cache) Carregar_Linha(livros [5]Livro, bloco int, mp *MP, bp *Banco
 		linha_retornar_mp := (primeiraLinha.Bloco) * 5
 
 		if primeiraLinha.Mesi == M {
-			Transferir_Cache_MP(mp, primeiraLinha, primeiraLinha.Bloco)
+			// mp.Transferir_Cache_MP(primeiraLinha, primeiraLinha.Bloco)
 		} else if primeiraLinha.Mesi == S {
-			bp.Atualiza_Shared_Exclusive(linha_retornar_mp, cache.id_processador)
+			bp.AtualizarSharedExclusive(linha_retornar_mp, cache.id_processador)
 		}
 
 		cache.Fila = cache.Fila[1:]
@@ -133,40 +135,35 @@ func (cache *Cache) Carregar_Linha(livros [5]Livro, bloco int, mp *MP, bp *Banco
 	return &cache.Linhas[posicao]
 }
 
-func (cache *Cache) Read_Miss(linha int, mp *MP, bp *BancoProcessadores) {
+func (cache *Cache) ReadMiss(linha int, mp *Memoria, bp *BancoProcessadores) {
 	bloco := linha / 5
 
 	var linha_escrita *Linha
 
-	encontrado, mesi_bp, linha_bp := bp.Verificar_MESI(linha)
+	encontrado, mesi_bp, linha_bp := bp.VerificarMESI(linha)
 
 	if !encontrado {
-		linha_escrita = Transferir_MP_Cache(mp, cache, bp, bloco)
+		linha_escrita = mp.Transferir_MP_Cache(cache, bp, bloco)
 		linha_escrita.Mesi = E
-		cache.Printa_Cache()
+		cache.Print()
 		return
 	}
 
 	switch mesi_bp {
 	case M:
-		//fmt.Print("Achei um M mesmo.")
-		linha_escrita = cache.Carregar_Linha(linha_bp.Livros, bloco, mp, bp)
+		linha_escrita = cache.CarregarLinha(linha_bp.Livros, bloco, mp, bp)
 		linha_escrita.Mesi = S
 
-		//linha_nova := cache.Carregar_Linha(linha_bp.Livros, bloco, mp, bp)
-		//linha_bp.PrintLinha()
 		linha_bp.Mesi = S
-		//linha_bp.PrintLinha()
-		//bp.BP[0].Cachezinha.Printa_Cache() //testando especificamente com escrever na CACHE 0 , puxar em outra, aí ele mostrou como ta na 0
-		Transferir_Cache_MP(mp, linha_bp, bloco)
+		mp.Transferir_Cache_MP(linha_bp, bloco)
 
 	case E:
-		linha_escrita = Transferir_MP_Cache(mp, cache, bp, bloco)
-		bp.Atualiza_Shared(linha, cache.id_processador)
+		linha_escrita = mp.Transferir_MP_Cache(cache, bp, bloco)
+		bp.AtualizarShared(linha, cache.id_processador)
 		linha_escrita.Mesi = S
 
 	case S:
-		linha_escrita = Transferir_MP_Cache(mp, cache, bp, bloco)
+		linha_escrita = mp.Transferir_MP_Cache(cache, bp, bloco)
 		linha_escrita.Mesi = S
 
 	default:
@@ -174,38 +171,38 @@ func (cache *Cache) Read_Miss(linha int, mp *MP, bp *BancoProcessadores) {
 	}
 
 	//cache.Printa_Cache()
-	linha_escrita.PrintLinha()
+	linha_escrita.Print()
 }
 
-func (cache *Cache) Read_Hit(linha int) {
-	linha_cache := cache.Procura_Cache(linha)
+func (cache *Cache) ReadHit(linha int) {
+	linha_cache := cache.ProcurarLinha(linha)
 	livro := linha_cache.Livros[linha%5]
 
 	fmt.Printf("%s", livro.ToString())
 	fmt.Printf("MESI do bloco: %d\n", linha_cache.Mesi)
 }
 
-func (cache *Cache) Write_Miss(linha int, reserva Reserva, mp *MP, bp *BancoProcessadores) {
+func (cache *Cache) WriteMiss(linha int, reserva Reserva, mp *Memoria, bp *BancoProcessadores) {
 	bloco := linha / 5
-	encontrado, mesi_bp, linha_bp := bp.Verificar_MESI(linha)
+	encontrado, mesi_bp, linha_bp := bp.VerificarMESI(linha)
 
 	if !encontrado {
-		linha_escrita := Transferir_MP_Cache(mp, cache, bp, bloco)
+		linha_escrita := mp.Transferir_MP_Cache(cache, bp, bloco)
 		linha_escrita.Mesi = E
 	} else {
 		switch mesi_bp {
 		case M:
-			linha_escrita := cache.Carregar_Linha(linha_bp.Livros, bloco, mp, bp)
+			linha_escrita := cache.CarregarLinha(linha_bp.Livros, bloco, mp, bp)
 			linha_escrita.Mesi = S
-			Transferir_Cache_MP(mp, linha_bp, bloco)
+			mp.Transferir_Cache_MP(linha_bp, bloco)
 
 		case E:
-			linha_escrita := Transferir_MP_Cache(mp, cache, bp, bloco)
-			bp.Atualiza_Shared(linha, cache.id_processador)
+			linha_escrita := mp.Transferir_MP_Cache(cache, bp, bloco)
+			bp.AtualizarShared(linha, cache.id_processador)
 			linha_escrita.Mesi = S
 
 		case S:
-			linha_escrita := Transferir_MP_Cache(mp, cache, bp, bloco)
+			linha_escrita := mp.Transferir_MP_Cache(cache, bp, bloco)
 			linha_escrita.Mesi = S
 
 		default:
@@ -213,32 +210,32 @@ func (cache *Cache) Write_Miss(linha int, reserva Reserva, mp *MP, bp *BancoProc
 		}
 	}
 
-	linha_cache := cache.Procura_Cache(linha)
+	linha_cache := cache.ProcurarLinha(linha)
 	livro := &linha_cache.Livros[linha%5]
 
 	if linha_cache.Mesi == E || linha_cache.Mesi == S {
 		linha_cache.Mesi = M
 	}
 
-	bp.Atualiza_Invalid(linha, cache.id_processador)
+	bp.AtualizarInvalid(linha, cache.id_processador)
 
 	livro.AdicionarReserva(reserva)
-	cache.Printa_Cache()
+	cache.Print()
 
 	fmt.Printf("Escrita realizada:\n")
 	fmt.Printf("%s", livro.ToString())
 	fmt.Printf("MESI do bloco: %d\n", linha_cache.Mesi)
 }
 
-func (cache *Cache) Write_Hit(linha int, reserva Reserva, mp *MP, bp *BancoProcessadores) {
-	linha_cache := cache.Procura_Cache(linha)
+func (cache *Cache) WriteHit(linha int, reserva Reserva, mp *Memoria, bp *BancoProcessadores) {
+	linha_cache := cache.ProcurarLinha(linha)
 	livro := &linha_cache.Livros[linha%5]
 
 	if linha_cache.Mesi == E || linha_cache.Mesi == S {
 		linha_cache.Mesi = M
 	}
 
-	bp.Atualiza_Invalid(linha, cache.id_processador)
+	bp.AtualizarInvalid(linha, cache.id_processador)
 
 	livro.AdicionarReserva(reserva)
 
@@ -270,16 +267,8 @@ func (c *Cache) ValoresDisponiveis() []uint8 { // n entendi totalmente.
 	return disponiveis
 }
 
-func Gerar_Aleatorio(quantidade int) int16 {
+func GerarAleatorio(quantidade int) int16 {
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	return int16(r.Intn(quantidade))
 }
-
-// func Define_Transacao(encontrado bool, leitura bool) {
-// 	if encontrado && leitura {
-// 	} else if encontrado {
-// 	} else if leitura {
-// 	} else {
-// 	}
-// }

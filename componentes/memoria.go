@@ -5,12 +5,22 @@ import (
 	"fmt"
 )
 
-type MP struct { //pelo menos 50 posições;
-	Livros [50]Livro
+//--Memoria---------------------------------------------------------------------
+
+type Memoria struct { //pelo menos 50 posições;
+	livros [50]Livro
 	// Tags   [10]MesiFlags //guardar na MP as tags, facilitar.
 }
 
-func PreencherLivros() MP {
+func InicializaMemoria() Memoria {
+	mp := Memoria{
+		livros: [50]Livro{},
+	}
+
+	return mp
+}
+
+func (mp *Memoria) PreencherLivros() {
 	secoes := []string{
 		"Tecnologia",
 		"Matemática",
@@ -24,43 +34,51 @@ func PreencherLivros() MP {
 		"Psicologia",
 	}
 
-	var mp MP
 	for i := 0; i < 50; i++ {
 		secao := secoes[i/5]
 		nome := fmt.Sprintf("Livro %d", i)
-		mp.Livros[i] = Livro{
+		mp.livros[i] = Livro{
 			Reservas: []Reserva{},
 			Nome:     nome,
 			Secao:    secao,
 		}
 	}
-
-	// for i := range mp.Tags {
-	// 	mp.Tags[i] = UNDEFINED
-	// }
-
-	return mp
 }
 
-func Printar_MP(memoria MP) {
-
-	for i, livro := range memoria.Livros {
+func (mp *Memoria) Print() {
+	for i, livro := range mp.livros {
 		fmt.Printf("Livro %d: Nome = %s, Seção = %s\n", i, livro.Nome, livro.Secao)
 	}
 }
 
-func Transferir_MP_Cache(mp *MP, cache *Cache, bp *BancoProcessadores, bloco int) *Linha {
-	linha_mp := [5]Livro{}
-
+func (mp *Memoria) GuardarLinha(bloco int, livros [constantes.TAMANHO_BLOCO]Livro) {
 	for i := 0; i < constantes.TAMANHO_BLOCO; i++ {
-		linha_mp[i] = mp.Livros[bloco*constantes.TAMANHO_BLOCO+i]
+		mp.livros[bloco*constantes.TAMANHO_BLOCO+1] = livros[i]
 	}
-
-	return cache.Carregar_Linha(linha_mp, bloco, mp, bp)
 }
 
-func Transferir_Cache_MP(mp *MP, linha_cache *Linha, bloco int) {
+func (mp *Memoria) CarregarLinha(bloco int) [constantes.TAMANHO_BLOCO]Livro {
+	linha_mp := [constantes.TAMANHO_BLOCO]Livro{}
+
 	for i := 0; i < constantes.TAMANHO_BLOCO; i++ {
-		mp.Livros[bloco*constantes.TAMANHO_BLOCO+i] = linha_cache.Livros[i]
+		linha_mp[i] = mp.livros[bloco*constantes.TAMANHO_BLOCO+i]
+	}
+
+	return linha_mp
+}
+
+func (mp *Memoria) Transferir_MP_Cache(cache *Cache, bp *BancoProcessadores, bloco int) *Linha {
+	linha_mp := [constantes.TAMANHO_BLOCO]Livro{}
+
+	for i := 0; i < constantes.TAMANHO_BLOCO; i++ {
+		linha_mp[i] = mp.livros[bloco*constantes.TAMANHO_BLOCO+i]
+	}
+
+	return cache.CarregarLinha(linha_mp, bloco, mp, bp)
+}
+
+func (mp *Memoria) Transferir_Cache_MP(linha_cache *Linha, bloco int) {
+	for i := 0; i < constantes.TAMANHO_BLOCO; i++ {
+		mp.livros[bloco*constantes.TAMANHO_BLOCO+i] = linha_cache.Livros[i]
 	}
 }
