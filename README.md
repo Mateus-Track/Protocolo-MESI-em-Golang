@@ -3,4 +3,4 @@ Repositório destinado à Implementação de um armazenamento de reservas de uma
 
 Nesse projeto, cada usuário é considerado um processador diferente, que possui uma Cache para armazenar os blocos de livros puxados da Memória Principal.
 
-![image](https://github.com/user-attachments/assets/d2c36ce4-ff08-4979-9885-a4d9d228b19c)
+![image](https://github.com/user-attachments/assets/20735d8f-2257-49b7-a933-3c483c7ac092)
