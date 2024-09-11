@@ -4,3 +4,7 @@ Repositório destinado à Implementação de um armazenamento de reservas de uma
 Nesse projeto, cada usuário é considerado um processador diferente, que possui uma Cache para armazenar os blocos de livros puxados da Memória Principal.
 
 ![image](https://github.com/user-attachments/assets/20735d8f-2257-49b7-a933-3c483c7ac092)
+
+## Como executar:
+
+Utilize o comando "go run ." para iniciar a execução do programa.
